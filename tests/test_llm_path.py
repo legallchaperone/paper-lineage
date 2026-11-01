@@ -1,5 +1,7 @@
 """The LLM path, with a fake model that reads the real prompt and answers like a good model would."""
 
+from __future__ import annotations
+
 import re
 
 from paper_lineage.classify import LLMClassifier, validate_evidence

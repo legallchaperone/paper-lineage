@@ -42,11 +42,22 @@ LLM-returned quote that cannot be found in the source text gets the edge dropped
 
 ## Install
 
+**No pip needed.** Download `lineage.pyz` (a single file with everything bundled) and run it with the
+`python3` you already have (3.9 or newer — check with `python3 --version`):
+
 ```bash
-pip install -e .            # Python ≥ 3.10
-# optional, for the PDF fallback on papers without arXiv HTML:
-#   macOS: brew install poppler     Debian/Ubuntu: apt install poppler-utils
+python3 lineage.pyz --help
 ```
+
+Optionally make it a command: `chmod +x lineage.pyz && mv lineage.pyz ~/bin/lineage` (any directory on
+your PATH), then just `lineage ...`.
+
+No `python3` at all? On macOS run `xcode-select --install` (gives python3); on Windows install Python
+from python.org or the Microsoft Store. Optional: `pdftotext` (poppler) for the PDF fallback on papers
+without arXiv HTML — macOS `brew install poppler`, Debian/Ubuntu `apt install poppler-utils`.
+
+From source (developers): `pip install -e '.[dev]'`; rebuild the single file with
+`scripts/build_pyz.sh`.
 
 ## Configure the LLM (any OpenAI-compatible endpoint, e.g. a local gateway)
 
@@ -54,7 +65,7 @@ pip install -e .            # Python ≥ 3.10
 export LINEAGE_LLM_BASE_URL=http://localhost:3000/v1   # your gateway; /chat/completions is appended
 export LINEAGE_LLM_MODEL=<model name your gateway serves>
 export LINEAGE_LLM_API_KEY=<key, if the gateway needs one>
-lineage --check-llm                                      # one tiny request to verify the setup
+python3 lineage.pyz --check-llm                         # one tiny request to verify the setup
 ```
 
 Optional: `S2_API_KEY` (Semantic Scholar key — raises rate limits, makes runs much faster).

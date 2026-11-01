@@ -5,3 +5,4 @@ __pycache__/
 lineage-*.html
 lineage-*.json
 lineage-*.mmd
+dist/

@@ -12,6 +12,15 @@ from collections.abc import Iterable
 from bs4 import BeautifulSoup, NavigableString, Tag
 
 from .arxiv import find_arxiv_id
+
+try:  # lxml is faster; the stdlib parser gives the same structure for LaTeXML pages
+    import lxml  # noqa: F401
+    HTML_PARSER = "lxml"
+except ImportError:  # pragma: no cover - depends on the environment
+    HTML_PARSER = "html.parser"
+import os as _os
+
+HTML_PARSER = _os.environ.get("LINEAGE_HTML_PARSER", HTML_PARSER)
 from .models import BibEntry, Citation, ParsedPaper
 
 # ---------------------------------------------------------------------------
@@ -202,7 +211,7 @@ def _label_index(bib: dict[str, BibEntry]) -> dict[str, str]:
 
 
 def parse_latexml(html: str, arxiv_id: str = "") -> ParsedPaper:
-    soup = BeautifulSoup(html, "lxml")
+    soup = BeautifulSoup(html, HTML_PARSER)
     for br in soup.select("br"):
         br.replace_with(" ")
     bib = _bib_from_html(soup)
