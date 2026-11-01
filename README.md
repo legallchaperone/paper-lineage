@@ -72,12 +72,12 @@ Recommended: install it as a normal command with [pipx](https://pipx.pypa.io) (o
 which puts `lineage` on your PATH in its own isolated environment:
 
 ```bash
-pipx install git+https://github.com/legallchaperone/paper-lineage
-# or: uv tool install git+https://github.com/legallchaperone/paper-lineage
+pipx install paper-lineage        # or: uv tool install paper-lineage
 lineage --help
 ```
 
-Try it once without installing: `uvx --from git+https://github.com/legallchaperone/paper-lineage lineage --help`.
+Try it once without installing: `uvx --from paper-lineage lineage --help`.
+(Before the first PyPI release, install from git: `pipx install git+https://github.com/legallchaperone/paper-lineage`.)
 
 **No pip at all?** Download the single-file build `lineage.pyz` (everything bundled) and run it with
 any `python3` 3.9 or newer: `python3 lineage.pyz --help`. Optionally make it a command:
