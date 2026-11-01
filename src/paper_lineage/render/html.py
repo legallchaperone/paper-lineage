@@ -19,6 +19,7 @@ from typing import Any
 
 from ..graph import LineageGraph
 from ..models import LINEAGE_ROLES
+from ..quality import _TITLE_SEPARATORS, abbreviation
 from .mathtext import plain, rich
 
 ROLE_SHORT = {"builds_on": "built on", "technique_source": "idea from", "component": "uses",
@@ -39,11 +40,27 @@ def _asset(name: str) -> bytes:
     return data
 
 
+def display_names(g: LineageGraph) -> dict[str, str]:
+    """One short name per paper, shared by the canvas and the walkthrough: the method name or alias, or an
+    acronym for titles without one (never an ellipsis-cut title); made unique with the year."""
+    out: dict[str, str] = {}
+    taken: set[str] = set()
+    for k in sorted(g.nodes, key=g._order):
+        m = g.nodes[k].meta
+        a = abbreviation(m)
+        if a.lower() in taken:
+            a = f"{a} ’{str(m.year)[-2:]}" if m.year else f"{a} (2)"
+        taken.add(a.lower())
+        out[k] = a
+    return out
+
+
 def graph_payload(g: LineageGraph) -> dict:
     nodes = {}
+    names = display_names(g)
     for k, n in g.nodes.items():
         m = n.meta
-        nodes[k] = {"name": plain(m.short_name), "title": plain(m.title), "year": m.year, "url": m.url, "kind": n.kind,
+        nodes[k] = {"name": plain(names[k]), "title": plain(m.title), "year": m.year, "url": m.url, "kind": n.kind,
                     "cites": m.citation_count,
                     "rel": None if n.relevance is None else round(n.relevance, 3), "note": n.note}
     edges = [{"p": e.parent, "c": e.child, "role": e.role, "d": e.directness, "inh": e.inherited,
@@ -74,21 +91,58 @@ class _Story:
         self.g = g
         self.T = g.nodes[g.target]
         self.sections: list[tuple[str, str, str, str]] = []   # (id, title, html, line colour)
+        # A paper is introduced by its full title with its short name in parentheses the first time the
+        # walkthrough mentions it; after that the short name alone is used.
+        self.abbr = display_names(g)
+        self.seen: set[str] = set()
+        self.uses: dict[str, int] = {}     # filled by a dry run of build(): papers named only once need no short name
+        self.counting = False
 
     # ---- small helpers
+    def _use(self, k: str) -> None:
+        if self.counting:
+            self.uses[k] = self.uses.get(k, 0) + 1
+
     def name(self, k: str) -> str:
-        return self.g.nodes[k].meta.short_name
+        self._use(k)
+        return self.abbr[k]
+
+    def full(self, k: str) -> str:
+        return " ".join((self.g.nodes[k].meta.title or self.abbr[k]).split()).rstrip(".")
+
+    def intro_parts(self, k: str, track: bool = True) -> tuple[str, str]:
+        """(text, short name to add in parentheses or ''): the full title on first mention, the short name
+        afterwards. Mentions inside folded quotes pass track=False so they do not use up the introduction."""
+        self._use(k)
+        if k in self.seen:
+            return self.abbr[k], ""
+        if track:
+            self.seen.add(k)
+        f, a = self.full(k), self.abbr[k]
+        lead = _TITLE_SEPARATORS.split(f, maxsplit=1)[0]
+        if a.lower() in (f.lower(), lead.lower()) or (not self.counting and self.uses.get(k, 0) < 2):
+            return f, ""        # 'VGGT: Visual …' already says VGGT; a paper named once needs no short name
+        return f, a
+
+    def ref(self, k: str, track: bool = True) -> str:
+        text, a = self.intro_parts(k, track)
+        return f"{text} ({a})" if a else text
+
+    def heading(self, k: str) -> str:
+        """Headings and navigation: the short name once introduced, the full title before that."""
+        self._use(k)
+        return self.abbr[k] if k in self.seen else self.full(k)
 
     def year(self, k: str) -> str:
         y = self.g.nodes[k].meta.year
         return str(y) if y else "?"
 
     def tname(self) -> str:
-        return rich(self.T.meta.short_name)
+        return rich(self.ref(self.g.target))
 
-    def link(self, k: str, label: str | None = None) -> str:
+    def link(self, k: str, label: str | None = None, track: bool = True) -> str:
         n = self.g.nodes[k]
-        text = rich(label or n.meta.short_name)
+        text = rich(label or self.ref(k, track))
         if n.meta.url:
             return (f'<a href="{_e(n.meta.url)}" target="_blank" rel="noopener" '
                     f'title="{_e(plain(n.meta.title))}">{text}</a>')
@@ -102,9 +156,10 @@ class _Story:
         return (f' <a class="ext" href="{_e(n.meta.url)}" target="_blank" rel="noopener" '
                 f'title="{_e(plain(n.meta.title))}" aria-label="Open {_e(plain(n.meta.title))}">↗</a>')
 
-    def mention(self, k: str, lane: int | str = "") -> str:
-        return (f'<button class="mention" data-node="{_e(k)}" data-lane="{lane}" '
-                f'title="{_e(plain(self.g.nodes[k].meta.title))}">{rich(self.name(k))}</button>')
+    def mention(self, k: str, lane: int | str = "", text: str | None = None) -> str:
+        # a link, not a <button>: long full titles must wrap like the surrounding text
+        return (f'<a class="mention" href="#" role="button" data-node="{_e(k)}" data-lane="{lane}" '
+                f'title="{_e(plain(self.g.nodes[k].meta.title))}">{rich(text or self.ref(k))}</a>')
 
     def edge(self, p: str, c: str):
         for e in self.g.edges:
@@ -129,11 +184,15 @@ class _Story:
         return rich(e.inherited) if e is not None and e.inherited else ""
 
     def line_title(self, line) -> str:
-        return f"{LINE_TITLE.get(line.role, line.role)}: {self.name(line.head)}"
+        return f"{LINE_TITLE.get(line.role, line.role)}: {self.heading(line.head)}"
 
     # ---- sections
     def intro(self) -> None:
         g = self.g
+        # the lede right below gives the full title, so a real name ('VGGT') is enough here; an acronym is not
+        has_name = not self.T.meta.short_name.endswith("…")
+        title = f"Where {self.name(g.target) if has_name else self.heading(g.target)} comes from"
+        lede = f'<p class="lede">{self.link(g.target)} · {self.year(g.target)}</p>'
         ins = [e for e in g.parents(g.target)]
         order = {"builds_on": 0, "technique_source": 1, "component": 2}
         ins.sort(key=lambda e: (order.get(e.role, 9), -e.weight))
@@ -146,7 +205,10 @@ class _Story:
             for e in es:
                 lane = next((i for i, line in enumerate(g.lines) if e.parent in line.best_path), "")
                 s = self.summary(e)
-                items.append(f"{self.mention(e.parent, lane)}{f' <span class=paren>({s})</span>' if s else ''}")
+                text, a = self.intro_parts(e.parent)      # one parenthesis: '(PRoPE — what was taken)'
+                paren = " — ".join(x for x in (rich(a), s) if x)
+                items.append(f"{self.mention(e.parent, lane, text)}"
+                             f"{f' <span class=paren>({paren})</span>' if paren else ''}")
             joined = items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
             clauses.append(f"{VERB[role]} {joined}")
         if clauses:
@@ -157,7 +219,7 @@ class _Story:
         routes = "".join(
             f'<a class="route" href="#line-{i}" style="--lc:{LINE_COLORS[i % 6]}"><span class="rl">'
             f'<i class="dot"></i>{i + 1}. {rich(self.line_title(line))}</span>'
-            f'<span class="rp">{" → ".join(rich(self.name(k)) for k in line.best_path[:-1])}</span></a>'
+            f'<span class="rp">{" → ".join(rich(self.heading(k)) for k in line.best_path[:-1])}</span></a>'
             for i, line in enumerate(g.lines))
         n = len(g.lines)
         if g.spine:
@@ -167,14 +229,14 @@ class _Story:
         else:
             peers = ""
         body = f"""
-<p class="lede">{self.link(g.target, self.T.meta.title)} · {self.year(g.target)}</p>
+{lede}
 {recipe_html}
 <p class="lead-in">That comes from {n} line{'s' if n != 1 else ''} of work, each drawn as a frame on the canvas. {peers}</p>
 <nav class="routes" aria-label="Lines of work">{routes}</nav>
 <p class="hint">Scroll to walk through each line, or click any paper to jump to it. Every claim is backed by a
 sentence from the papers themselves: open its <span class="evword">quote</span>, or
 <button class="linkish" id="all-quotes" type="button">show all quotes</button>.</p>"""
-        self.sections.append(("intro", f"Where {self.T.meta.short_name} comes from", body, ""))
+        self.sections.append(("intro", title, body, ""))
 
     def line_section(self, i: int, line) -> None:
         g = self.g
@@ -188,6 +250,7 @@ sentence from the papers themselves: open its <span class="evword">quote</span>,
         items = []
         for j, k in enumerate(chain):
             n = g.nodes[k]
+            label = self.ref(k)
             body = []
             if j == 0:
                 body.append({
@@ -213,14 +276,14 @@ sentence from the papers themselves: open its <span class="evword">quote</span>,
             extra = ""
             if others:
                 extra = ('<p class="others">Other parents: ' + ", ".join(
-                    f"{self.link(x.parent)} <span class='yr'>({SHORT_VERB.get(x.role, x.role)})</span>" for x in others)
+                    f"{self.link(x.parent, track=False)} <span class='yr'>({SHORT_VERB.get(x.role, x.role)})</span>" for x in others)
                     + ".</p>")
             ev = self.quote(e, extra=extra) if (e is not None or extra) else ""
             if d is not None and d.role in LINEAGE_ROLES and d.evidence:
-                ev += self.quote(d, label=f"quote: {plain(self.T.meta.short_name)}")
+                ev += self.quote(d, label=f"quote: {plain(self.name(g.target))}")
             items.append(
                 f'<li class="step tl" data-focus="node:{_e(k)}:{i}" data-node="{_e(k)}" data-lane="{i}">'
-                f'<div class="tl-head"><span class="when">{self.year(k)}</span> <b>{rich(n.meta.short_name)}</b>'
+                f'<div class="tl-head"><span class="when">{self.year(k)}</span> <b>{rich(label)}</b>'
                 f'{self.ext(k)}</div><div class="tl-body{" muted" if j == 0 else ""}">{"".join(body)}</div>'
                 f'{direct}{ev}</li>')
         alts = []
@@ -314,6 +377,12 @@ sentence from the papers themselves: open its <span class="evword">quote</span>,
         self.sections.append(("about", "About this page", body, ""))
 
     def build(self):
+        self.counting = True
+        self._build()
+        self.counting, self.sections, self.seen = False, [], set()
+        return self._build()
+
+    def _build(self):
         self.intro()
         for i, line in enumerate(self.g.lines):
             self.line_section(i, line)
@@ -430,7 +499,7 @@ blockquote cite{display:block;font-style:normal;color:var(--muted);font-size:14p
 .alts ul{list-style:none;margin:0;padding:0}
 .alts li{font-size:17px;line-height:1.55;margin:0 0 12px}
 .alts li.on{outline:2px solid rgba(224,49,49,.35);outline-offset:4px;border-radius:2px}
-.mention{font:inherit;color:var(--navy);background:none;border:0;padding:0;cursor:pointer;
+.mention{font:inherit;color:var(--navy);text-decoration:none;cursor:pointer;
  border-bottom:1px dashed rgba(29,58,138,.45)}.mention:hover{border-bottom-style:solid}
 details.group{border-top:1px solid var(--rule);padding:8px 0}
 details.group summary{cursor:pointer;font-size:17.5px}
@@ -705,7 +774,8 @@ function stepFor(k, lane) {
   return cands.find(c => c.dataset.lane === lane) || cands[0];
 }
 function fromCanvas(k, lane) { const s = stepFor(k, lane); if (s) scrollToEl(s); else setFocus(`node:${k}:${lane}`); }
-document.querySelectorAll('.mention').forEach(m => m.addEventListener('click', () => {
+document.querySelectorAll('.mention').forEach(m => m.addEventListener('click', ev => {
+  ev.preventDefault();
   const s = [...document.querySelectorAll('.step')].find(x => x.dataset.node === m.dataset.node && x.dataset.lane === m.dataset.lane);
   if (s) scrollToEl(s); else setFocus(`node:${m.dataset.node}:${m.dataset.lane}`);
 }));
@@ -792,7 +862,7 @@ def render_html(g: LineageGraph) -> str:
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#fbfbfa">
-<title>Lineage: {_e(plain(tgt.meta.short_name))}</title><style>{css}</style>
+<title>Lineage: {_e(plain(tgt.meta.title))}</title><style>{css}</style>
 <style>/* Temml (c) Ron Kok, MIT License */
 {temml_css}</style></head>
 <body>

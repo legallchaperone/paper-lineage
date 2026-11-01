@@ -94,6 +94,33 @@ def short_title(title: str) -> str:
     return (out or words[0]) + "…"
 
 
+_ACRONYM_SKIP = _CUT_WORDS | {"a", "an", "the"}
+
+
+def acronym(title: str, max_chars: int = 6) -> str:
+    """Initials of a title's content words, for papers without a method name:
+    'Possible Principles Underlying the Transformations of Sensory Messages' -> 'PPUTSM'.
+    Name-like tokens ('GAN', '3D') are kept whole; hyphenated words give one initial per part."""
+    out = ""
+    for tok in re.findall(r"[^\W_]+(?:['’-][^\W_]+)*", title or ""):
+        if tok.lower() in _ACRONYM_SKIP:
+            continue
+        piece = "".join(p if is_namelike(p) else p[0].upper() for p in re.split(r"-", tok.replace("’", "'")) if p)
+        piece = piece.replace("'", "")
+        if out and len(out) + len(piece) > max_chars:
+            break
+        out += piece
+    return out or short_title(title)
+
+
+def abbreviation(meta) -> str:
+    """The name the walkthrough uses once a paper has been introduced by its full title: its method name
+    or alias when it has one ('VGGT', 'Barlow Twins', 'Scaling Rectified Flow Transformers'), otherwise
+    an acronym, so a name is never an ellipsis-cut title."""
+    nm = meta.short_name
+    return acronym(meta.title) if nm.endswith("…") else nm
+
+
 def normalize(g: LineageGraph) -> LineageGraph:
     """Apply the invariants in place (idempotent)."""
     for e in g.edges:
