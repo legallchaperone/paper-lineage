@@ -102,6 +102,13 @@ Optional: `pdftotext` (poppler) for the PDF fallback on papers without arXiv HTM
 
 From source (developers): `pip install -e '.[dev]'`; rebuild the single file with `scripts/build_pyz.sh`.
 
+## Use it from your AI agent
+
+Using Claude Code, Codex, Cursor or another coding agent? Point it at this repo's
+[`AGENTS.md`](AGENTS.md) / [`skills/paper-lineage/SKILL.md`](skills/paper-lineage/SKILL.md), or just say
+"install paper-lineage and trace the lineage of arxiv.org/abs/..." and it will know what to do.
+For Claude Code, copy the skill folder to `~/.claude/skills/paper-lineage/`.
+
 ## Configure the LLM
 
 ```bash
