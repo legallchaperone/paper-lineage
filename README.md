@@ -26,7 +26,7 @@ lineage https://arxiv.org/abs/2609.24984 -f html     # writes lineage-2609.24984
 lineage https://arxiv.org/abs/2609.24984 --evidence  # or print it in the terminal
 ```
 
-(See [Install](#install) and [Configure the LLM](#configure-the-llm-any-openai-compatible-endpoint-eg-a-local-gateway) below.)
+(See [Install](#install) and [Configure the LLM](#configure-the-llm) below.)
 
 ## Or in your terminal
 
@@ -56,15 +56,28 @@ Done differently: VideoREPA (2025), World-consistent Video Diffusion with Explic
 ```
 (illustrative; see `docs/examples/` for real output)
 
-## Design in one paragraph
+## How to read the result
 
-A paper's lineage is usually **several lines merging** (a technique line, a base-model line, an
-ingredient line), not one chain — so the result is a DAG drawn as *lines* (tributaries) that flow into
-the target, with up to two "done differently" **alternatives** per node. A **main path** is highlighted
-only when one line clearly dominates (`--spine auto`); otherwise lines are shown as peers. Everything is
-**strictly citation-grounded**: every edge carries the verbatim sentence from the citing paper that
-justifies it, the LLM only classifies citations it is shown (it never introduces papers), and an
-LLM-returned quote that cannot be found in the source text gets the edge dropped.
+A paper rarely descends from a single chain of papers. It usually stands on several separate lines of
+work at once: a technique it borrows, a base model it builds on, an ingredient it plugs in. So the
+output is not one path but a graph:
+
+- **Lines flow into your paper.** Each line is a chain of papers, oldest on the left, ending at the
+  target. Lines are shown side by side as peers.
+- **Main path, only when earned.** One line is highlighted as the main path only if it clearly
+  dominates the others (`--spine auto`, the default). Otherwise nothing is singled out.
+- **"Done differently" branches.** Each paper can carry up to two alternatives: approaches it
+  contrasts itself with.
+
+## Nothing is made up
+
+Every claim is traceable to the text of the papers:
+
+- **Every arrow has evidence.** Each link carries the exact sentence from the newer paper that
+  justifies it.
+- **The LLM only judges, never invents.** It labels citations it is shown. It cannot add papers.
+- **Quotes are checked.** If a quote returned by the LLM cannot be found in the paper's text, that
+  link is dropped.
 
 ## Install
 
@@ -89,7 +102,7 @@ Optional: `pdftotext` (poppler) for the PDF fallback on papers without arXiv HTM
 
 From source (developers): `pip install -e '.[dev]'`; rebuild the single file with `scripts/build_pyz.sh`.
 
-## Configure the LLM (any OpenAI-compatible endpoint, e.g. a local gateway)
+## Configure the LLM
 
 ```bash
 export LINEAGE_LLM_BASE_URL=http://localhost:3000/v1   # your gateway; /chat/completions is appended
@@ -99,8 +112,7 @@ lineage --check-llm                         # one tiny request to verify the set
 ```
 
 Optional: `S2_API_KEY` (Semantic Scholar key — raises rate limits, makes runs much faster).
-Without an LLM configured the tool falls back to `--no-llm` heuristics (decent for the first
-generation, noticeably weaker deeper in the tree — see "Quality" below).
+Without an LLM configured the tool falls back to `--no-llm` heuristics.
 
 ## Usage
 
