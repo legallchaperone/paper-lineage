@@ -17,13 +17,13 @@ Try it yourself: open <a href="docs/examples/worldcrafter.llm.html"><code>docs/e
 - **Every arrow has a receipt.** Each edge carries the verbatim sentence from the newer paper. The LLM only classifies citations it is shown, never invents papers, and any quote it cannot find in the source text is dropped.
 - **"Done differently" branches.** Dashed boxes show the alternatives a paper contrasts itself with.
 - **A page you can actually read.** Canvas on the left, walkthrough on the right: scroll the text and the canvas glides to the paper being discussed. One self-contained HTML file, no internet needed to view it.
-- **Zero install.** One `lineage.pyz` file and the `python3` you already have. Works with any OpenAI-compatible endpoint, and falls back to heuristics with no LLM.
+- **Easy install.** `pipx install` gives you a normal `lineage` command (or use the single-file `lineage.pyz`). Works with any OpenAI-compatible endpoint, and falls back to heuristics with no LLM.
 
 ## Quick start
 
 ```bash
-python3 lineage.pyz https://arxiv.org/abs/2507.07982 -f html     # writes lineage-2507.07982.html
-python3 lineage.pyz https://arxiv.org/abs/2507.07982 --evidence  # or print it in the terminal
+lineage https://arxiv.org/abs/2609.24984 -f html     # writes lineage-2609.24984.html (the page above)
+lineage https://arxiv.org/abs/2609.24984 --evidence  # or print it in the terminal
 ```
 
 (See [Install](#install) and [Configure the LLM](#configure-the-llm-any-openai-compatible-endpoint-eg-a-local-gateway) below.)
@@ -68,22 +68,26 @@ LLM-returned quote that cannot be found in the source text gets the edge dropped
 
 ## Install
 
-**No pip needed.** Download `lineage.pyz` (a single file with everything bundled) and run it with the
-`python3` you already have (3.9 or newer — check with `python3 --version`):
+Recommended: install it as a normal command with [pipx](https://pipx.pypa.io) (or [uv](https://docs.astral.sh/uv/)),
+which puts `lineage` on your PATH in its own isolated environment:
 
 ```bash
-python3 lineage.pyz --help
+pipx install git+https://github.com/legallchaperone/paper-lineage
+# or: uv tool install git+https://github.com/legallchaperone/paper-lineage
+lineage --help
 ```
 
-Optionally make it a command: `chmod +x lineage.pyz && mv lineage.pyz ~/bin/lineage` (any directory on
-your PATH), then just `lineage ...`.
+Try it once without installing: `uvx --from git+https://github.com/legallchaperone/paper-lineage lineage --help`.
 
-No `python3` at all? On macOS run `xcode-select --install` (gives python3); on Windows install Python
-from python.org or the Microsoft Store. Optional: `pdftotext` (poppler) for the PDF fallback on papers
-without arXiv HTML — macOS `brew install poppler`, Debian/Ubuntu `apt install poppler-utils`.
+**No pip at all?** Download the single-file build `lineage.pyz` (everything bundled) and run it with
+any `python3` 3.9 or newer: `python3 lineage.pyz --help`. Optionally make it a command:
+`chmod +x lineage.pyz && mv lineage.pyz ~/bin/lineage`.
+No `python3`? On macOS run `xcode-select --install`; on Windows install Python from python.org.
 
-From source (developers): `pip install -e '.[dev]'`; rebuild the single file with
-`scripts/build_pyz.sh`.
+Optional: `pdftotext` (poppler) for the PDF fallback on papers without arXiv HTML — macOS
+`brew install poppler`, Debian/Ubuntu `apt install poppler-utils`.
+
+From source (developers): `pip install -e '.[dev]'`; rebuild the single file with `scripts/build_pyz.sh`.
 
 ## Configure the LLM (any OpenAI-compatible endpoint, e.g. a local gateway)
 
@@ -91,7 +95,7 @@ From source (developers): `pip install -e '.[dev]'`; rebuild the single file wit
 export LINEAGE_LLM_BASE_URL=http://localhost:3000/v1   # your gateway; /chat/completions is appended
 export LINEAGE_LLM_MODEL=<model name your gateway serves>
 export LINEAGE_LLM_API_KEY=<key, if the gateway needs one>
-python3 lineage.pyz --check-llm                         # one tiny request to verify the setup
+lineage --check-llm                         # one tiny request to verify the setup
 ```
 
 Optional: `S2_API_KEY` (Semantic Scholar key — raises rate limits, makes runs much faster).
@@ -135,7 +139,7 @@ everything. `-f json` keeps the full graph plus the decision log (`decisions`), 
 place to look when a result surprises you. Re-render a saved run without fetching anything:
 
 ```bash
-python3 lineage.pyz --render lineage-2609.24984.json -f html
+lineage --render lineage-2609.24984.json -f html
 ```
 
 ## How it works
