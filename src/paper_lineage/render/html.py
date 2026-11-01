@@ -61,18 +61,30 @@ def _e(s: Any) -> str:
     return html.escape(str(s if s is not None else ""))
 
 
+LINE_COLORS = ["#a5d8ff", "#b2f2bb", "#ffd8a8", "#d0bfff", "#eebefa", "#ffc9c9"]   # same as the canvas frames
+SHORT_VERB = {"builds_on": "built on", "technique_source": "idea from", "component": "uses"}
+
+
 class _Story:
+    """The walkthrough. Hierarchy: answer first (recipe), then one section per line that opens with what the
+    paper takes from that line and then shows how it got there as a compact timeline. Quotes are always
+    available but folded away, so the claims stay readable."""
+
     def __init__(self, g: LineageGraph):
         self.g = g
         self.T = g.nodes[g.target]
-        self.sections: list[tuple[str, str, str]] = []   # (id, title, html)
+        self.sections: list[tuple[str, str, str, str]] = []   # (id, title, html, line colour)
 
+    # ---- small helpers
     def name(self, k: str) -> str:
         return self.g.nodes[k].meta.short_name
 
     def year(self, k: str) -> str:
         y = self.g.nodes[k].meta.year
         return str(y) if y else "?"
+
+    def tname(self) -> str:
+        return rich(self.T.meta.short_name)
 
     def link(self, k: str, label: str | None = None) -> str:
         n = self.g.nodes[k]
@@ -82,17 +94,17 @@ class _Story:
                     f'title="{_e(plain(n.meta.title))}">{text}</a>')
         return f'<span title="{_e(plain(n.meta.title))}">{text}</span>'
 
+    def ext(self, k: str) -> str:
+        """Small ↗ link to the paper itself (full title in the tooltip)."""
+        n = self.g.nodes[k]
+        if not n.meta.url:
+            return ""
+        return (f' <a class="ext" href="{_e(n.meta.url)}" target="_blank" rel="noopener" '
+                f'title="{_e(plain(n.meta.title))}" aria-label="Open {_e(plain(n.meta.title))}">↗</a>')
+
     def mention(self, k: str, lane: int | str = "") -> str:
-        """A paper name in the text that focuses it on the canvas when clicked."""
         return (f'<button class="mention" data-node="{_e(k)}" data-lane="{lane}" '
                 f'title="{_e(plain(self.g.nodes[k].meta.title))}">{rich(self.name(k))}</button>')
-
-    def quote(self, e) -> str:
-        if e is None or not e.evidence:
-            return ""
-        where = SECTION_NAME.get(e.section_kind, "")
-        src = f"{self.name(e.child)}{', ' + where if where else ''}"
-        return f'<blockquote>“{rich(e.evidence)}”<cite>— {rich(src)}</cite></blockquote>'
 
     def edge(self, p: str, c: str):
         for e in self.g.edges:
@@ -100,169 +112,191 @@ class _Story:
                 return e
         return None
 
-    @staticmethod
-    def inh(e) -> str:
-        return f": {rich(e.inherited.rstrip('.'))}." if e is not None and e.inherited else "."
+    def citing(self, e) -> str:
+        """Which paper the evidence sentence comes from: the newer paper, i.e. the child of a lineage
+        edge, but the parent of an 'alternative' edge (the paper that contrasts itself)."""
+        return e.parent if e.role == "alternative" else e.child
+
+    def quote(self, e, label: str = "quote", extra: str = "") -> str:
+        if e is None or not e.evidence:
+            return f'<details class="ev"><summary>{label}</summary>{extra}</details>' if extra else ""
+        where = SECTION_NAME.get(e.section_kind, "")
+        src = f"{self.name(self.citing(e))}{', ' + where if where else ''}"
+        return (f'<details class="ev"><summary>{label}</summary><blockquote>“{rich(e.evidence)}”'
+                f'<cite>— {rich(src)}</cite></blockquote>{extra}</details>')
+
+    def summary(self, e) -> str:
+        return rich(e.inherited) if e is not None and e.inherited else ""
 
     def line_title(self, line) -> str:
         return f"{LINE_TITLE.get(line.role, line.role)}: {self.name(line.head)}"
 
-    # -- sections
+    # ---- sections
     def intro(self) -> None:
-        g, T = self.g, self.T
-        lines = g.lines
-        routes = "".join(
-            f'<li><a href="#line-{i}" class="route"><b>{i + 1}. {rich(self.line_title(line))}</b></a><br>'
-            + " → ".join(rich(self.name(k)) for k in line.best_path) + "</li>"
-            for i, line in enumerate(lines))
-        if g.spine:
-            dom = f"One line clearly dominates ({_e(g.spine_reason)}); it is starred on the canvas."
-        elif len(lines) > 1:
-            dom = "No single line dominates: they are peers that merge in this paper, so read them in any order."
+        g = self.g
+        ins = [e for e in g.parents(g.target)]
+        order = {"builds_on": 0, "technique_source": 1, "component": 2}
+        ins.sort(key=lambda e: (order.get(e.role, 9), -e.weight))
+        clauses = []
+        for role in ("builds_on", "technique_source", "component"):
+            es = [e for e in ins if e.role == role]
+            if not es:
+                continue
+            items = []
+            for e in es:
+                lane = next((i for i, line in enumerate(g.lines) if e.parent in line.best_path), "")
+                s = self.summary(e)
+                items.append(f"{self.mention(e.parent, lane)}{f' <span class=paren>({s})</span>' if s else ''}")
+            joined = items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
+            clauses.append(f"{VERB[role]} {joined}")
+        if clauses:
+            recipe = clauses[0] if len(clauses) == 1 else "; ".join(clauses[:-1]) + "; and " + clauses[-1]
+            recipe_html = f'<p class="recipe"><b>{self.tname()}</b> {recipe}.</p>'
         else:
-            dom = ""
-        n = len(lines)
+            recipe_html = "<p>No lineage was kept for this paper.</p>"
+        routes = "".join(
+            f'<a class="route" href="#line-{i}" style="--lc:{LINE_COLORS[i % 6]}"><span class="rl">'
+            f'<i class="dot"></i>{i + 1}. {rich(self.line_title(line))}</span>'
+            f'<span class="rp">{" → ".join(rich(self.name(k)) for k in line.best_path[:-1])}</span></a>'
+            for i, line in enumerate(g.lines))
+        n = len(g.lines)
+        if g.spine:
+            peers = "One of them clearly dominates; it is starred on the canvas."
+        elif n > 1:
+            peers = "No single line dominates, so read them in any order."
+        else:
+            peers = ""
         body = f"""
-<p class="lede">{self.link(g.target, T.meta.title)} ({self.year(g.target)})</p>
-<p>This page traces where <b>{rich(T.meta.short_name)}</b> comes from. It draws on {n} line{'s' if n != 1 else ''}
-of work. Each one is a frame on the canvas, oldest paper on the left, flowing into
-{rich(T.meta.short_name)} on the right. {dom}</p>
-<p>Every link is backed by a sentence quoted from the newer paper. Nothing here comes from outside
-knowledge: if a paper did not say it, it is not drawn.</p>
-<h3>Reading routes</h3>
-<ul class="routes">{routes}</ul>
-<h3>How to read the drawing</h3>
-<ul>
-<li>A <b>frame</b> is one line of work. Arrows say how the newer paper uses the older one:
-<i>built on</i>, <i>idea from</i> or <i>uses</i>.</li>
-<li><b>Dashed boxes</b> hanging below a paper are approaches it contrasts itself with: how it could have
-been done differently.</li>
-<li><b>Hatched boxes</b> are where this run stopped tracing (paper budget or depth limit).</li>
-<li>The <span class="redcircle">red circle</span> marks the paper the text is talking about. Click any
-paper, on the canvas or in the text, to jump to it. <b>Whole canvas</b> zooms back out.</li>
-</ul>"""
-        self.sections.append(("intro", f"Where {T.meta.short_name} comes from", body))
+<p class="lede">{self.link(g.target, self.T.meta.title)} · {self.year(g.target)}</p>
+{recipe_html}
+<p class="lead-in">That comes from {n} line{'s' if n != 1 else ''} of work, each drawn as a frame on the canvas. {peers}</p>
+<nav class="routes" aria-label="Lines of work">{routes}</nav>
+<p class="hint">Scroll to walk through each line, or click any paper to jump to it. Every claim is backed by a
+sentence from the papers themselves: open its <span class="evword">quote</span>, or
+<button class="linkish" id="all-quotes" type="button">show all quotes</button>.</p>"""
+        self.sections.append(("intro", f"Where {self.T.meta.short_name} comes from", body, ""))
 
     def line_section(self, i: int, line) -> None:
         g = self.g
-        chain = line.best_path
-        origin = chain[0]
-        start = {
-            "origin": "None of its own references survived the filters as on-topic lineage, so this is where "
-                      "the line starts.",
-            "frontier": "The trail continues further back, but this run stopped here (paper budget or depth "
-                        "limit). Re-run with a larger <code>--max-nodes</code> or <code>--max-depth</code> "
-                        "to go further.",
-            "foundation": "It is a widely used foundation: shown, but not traced further.",
-        }.get(g.nodes[origin].kind, "")
-        parts = [f'<p>This line starts at {self.mention(origin, i)} ({self.year(origin)}) and reaches '
-                 f'{rich(self.T.meta.short_name)} through {self.mention(line.head, i)}.</p>']
+        chain = line.best_path[:-1]          # oldest .. head (target excluded)
+        head = line.head
+        into = self.edge(head, g.target)
+        verb = VERB.get(line.role, line.role)
+        s = self.summary(into)
+        take = (f'<p class="takeaway" data-focus="node:{_e(head)}:{i}"><b>{self.tname()}</b> {verb} '
+                f'{self.mention(head, i)}{": " + s if s else ""}.</p>{self.quote(into)}')
+        items = []
         for j, k in enumerate(chain):
             n = g.nodes[k]
-            is_t = k == g.target
-            blk = [f'<h3>{"→ " if is_t else ""}{rich(n.meta.short_name)} <span class="yr">· {self.year(k)}</span></h3>']
-            if not is_t:
-                label = n.meta.title if n.meta.short_name != n.meta.title else (
-                    "open on arXiv" if n.meta.arxiv_id else n.meta.title)
-                blk.append(f'<p class="fulltitle">{self.link(k, label)}</p>')
+            body = []
             if j == 0:
-                if start:
-                    blk.append(f"<p>{start}</p>")
+                body.append({
+                    "origin": "Earliest paper kept in this line: its own references were off-topic or generic.",
+                    "frontier": "The trail goes further back, but this run did not follow it (paper budget or depth limit).",
+                    "foundation": "A widely used foundation: shown, not traced further.",
+                }.get(n.kind, "Earliest paper kept in this line."))
+                e = None
             else:
-                prev = chain[j - 1]
-                e = self.edge(prev, k)
+                e = self.edge(chain[j - 1], k)
                 if e is not None:
-                    blk.append(f"<p><b>{rich(n.meta.short_name)}</b> {VERB.get(e.role, e.role)} "
-                               f"{self.mention(prev, i)}{self.inh(e)}</p>")
-                    blk.append(self.quote(e))
-            if not is_t and k != line.head:      # shortcut straight into the target
-                d = self.edge(k, g.target)
-                if d is not None and d.role in LINEAGE_ROLES:
-                    blk.append(f'<p class="aside">{rich(self.T.meta.short_name)} {DIRECT.get(d.role, d.role)} '
-                               f'{rich(n.meta.short_name)}{self.inh(d)}</p>')
-                    blk.append(self.quote(d))
-            if not is_t:
-                others = [e for e in g.parents(k) if e.parent not in chain]
-                if others:
-                    items = ", ".join(f"{self.link(e.parent)} <span class='yr'>({ROLE_SHORT.get(e.role, e.role)})</span>"
-                                      for e in others)
-                    blk.append(f'<p class="aside">Also feeding into {rich(n.meta.short_name)}: {items}.</p>')
-                alts = [e for e in g.children(k, lineage_only=False) if e.role == "alternative"][:2]
-                if alts:
-                    items = ", ".join(f"{self.mention(e.child, i)} ({self.year(e.child)})" for e in alts)
-                    blk.append(f'<p class="aside">Done differently: {items}.</p>')
-                    for e in alts:
-                        blk.append(f'<div class="alt" data-focus="node:{_e(e.child)}:{i}" data-node="{_e(e.child)}" '
-                                   f'data-lane="{i}">{self.quote(e)}</div>')
-            focus = f"node:{k}:{'t' if is_t else i}"
-            lane = "t" if is_t else i
-            parts.append(f'<div class="step" data-focus="{_e(focus)}" data-node="{_e(k)}" data-lane="{lane}">'
-                         + "".join(blk) + "</div>")
-        self.sections.append((f"line-{i}", f"{i + 1}. {self.line_title(line)}", "".join(parts)))
+                    sm = self.summary(e)
+                    body.append(f"{SHORT_VERB.get(e.role, e.role)} {self.mention(chain[j - 1], i)}"
+                                f"{': ' + sm if sm else ''}.")
+            d = self.edge(k, g.target) if k != head else None
+            direct = ""
+            if d is not None and d.role in LINEAGE_ROLES:
+                ds = self.summary(d)
+                phrase = {"builds_on": "also builds directly on it", "technique_source": "also takes an idea directly from it",
+                          "component": "also uses it directly"}.get(d.role, "also uses it directly")
+                direct = (f'<div class="direct">↘ {self.tname()} {phrase}{": " + ds if ds else ""}.</div>')
+            others = [x for x in g.parents(k) if x.parent not in chain]
+            extra = ""
+            if others:
+                extra = ('<p class="others">Other parents: ' + ", ".join(
+                    f"{self.link(x.parent)} <span class='yr'>({SHORT_VERB.get(x.role, x.role)})</span>" for x in others)
+                    + ".</p>")
+            ev = self.quote(e, extra=extra) if (e is not None or extra) else ""
+            if d is not None and d.role in LINEAGE_ROLES and d.evidence:
+                ev += self.quote(d, label=f"quote: {plain(self.T.meta.short_name)}")
+            items.append(
+                f'<li class="step tl" data-focus="node:{_e(k)}:{i}" data-node="{_e(k)}" data-lane="{i}">'
+                f'<div class="tl-head"><span class="when">{self.year(k)}</span> <b>{rich(n.meta.short_name)}</b>'
+                f'{self.ext(k)}</div><div class="tl-body{" muted" if j == 0 else ""}">{"".join(body)}</div>'
+                f'{direct}{ev}</li>')
+        alts = []
+        for k in chain:
+            for e in [x for x in g.children(k, lineage_only=False) if x.role == "alternative"][:2]:
+                alts.append(
+                    f'<li class="alt" data-focus="node:{_e(e.child)}:{i}" data-node="{_e(e.child)}" data-lane="{i}">'
+                    f'<b>{self.link(e.child)}</b> <span class="yr">· {self.year(e.child)}</span> '
+                    f'<span class="muted">— {rich(self.name(k))} contrasts itself with it</span>{self.quote(e)}</li>')
+        alts_html = (f'<div class="alts"><h4>Done differently along the way</h4><ul>{"".join(alts)}</ul></div>'
+                     if alts else "")
+        lead = (f'<p class="tl-lead">How {self.mention(head, i)} came about, oldest first:</p>'
+                if len(chain) > 1 else "")
+        body = f'{take}{lead}<ol class="timeline">{"".join(items)}</ol>{alts_html}'
+        self.sections.append((f"line-{i}", f"{i + 1}. {self.line_title(line)}", body, LINE_COLORS[i % 6]))
 
     def differently(self) -> None:
         g = self.g
         alts = [e for e in g.children(g.target, lineage_only=False) if e.role == "alternative"][:3]
         if not alts:
             return
-        parts = [f"<p>{rich(self.T.meta.short_name)} positions itself against these approaches to the same "
-                 "problem.</p>"]
-        for e in alts:
-            parts.append(f'<div class="step" data-focus="node:{_e(e.child)}:t" data-node="{_e(e.child)}" '
-                         f'data-lane="t"><h3>{rich(self.name(e.child))} <span class="yr">· {self.year(e.child)}</span></h3>'
-                         f'<p class="fulltitle">{self.link(e.child, g.nodes[e.child].meta.title)}</p>'
-                         f'{self.quote(e)}</div>')
-        self.sections.append(("differently", "Done differently", "".join(parts)))
+        items = "".join(
+            f'<li class="alt" data-focus="node:{_e(e.child)}:t" data-node="{_e(e.child)}" data-lane="t">'
+            f'<b>{self.link(e.child)}</b> <span class="yr">· {self.year(e.child)}</span>{self.quote(e)}</li>'
+            for e in alts)
+        body = (f"<p>Approaches to the same problem that {self.tname()} positions itself against.</p>"
+                f'<div class="alts"><ul>{items}</ul></div>')
+        self.sections.append(("differently", "Done differently", body, ""))
 
     def extras(self) -> None:
         g = self.g
         desc = [k for k, n in g.nodes.items() if n.kind == "descendant"]
         if desc:
-            parts = [f"<p>Papers that, in their own words, build on {rich(self.T.meta.short_name)}.</p>"]
+            items = []
             for k in desc:
                 e = self.edge(g.target, k)
-                verb = VERB.get(e.role, "builds on") if e else "builds on"
-                parts.append(f'<div class="step" data-focus="node:{_e(k)}:d" data-node="{_e(k)}" data-lane="d">'
-                             f'<h3>{rich(self.name(k))} <span class="yr">· {self.year(k)}</span></h3>'
-                             f'<p class="fulltitle">{self.link(k, g.nodes[k].meta.title)}</p>'
-                             f'<p><b>{rich(self.name(k))}</b> {verb} {rich(self.T.meta.short_name)}{self.inh(e)}</p>'
-                             f'{self.quote(e)}</div>')
-            self.sections.append(("descendants", "What came after", "".join(parts)))
+                sm = self.summary(e)
+                items.append(f'<li class="alt" data-focus="node:{_e(k)}:d" data-node="{_e(k)}" data-lane="d">'
+                             f'<b>{self.link(k)}</b> <span class="yr">· {self.year(k)}</span>'
+                             f'<div>{SHORT_VERB.get(e.role, "built on") if e else "built on"} {self.tname()}'
+                             f'{": " + sm if sm else ""}.</div>{self.quote(e)}</li>')
+            self.sections.append(("descendants", "What came after",
+                                  f"<p>Papers that, in their own words, build on {self.tname()}.</p>"
+                                  f'<div class="alts"><ul>{"".join(items)}</ul></div>', ""))
         conc = [k for k, n in g.nodes.items() if n.kind == "concurrent"]
         if conc:
-            items = "".join(f"<li>{self.link(k, g.nodes[k].meta.title)} <span class='yr'>({self.year(k)})</span>"
-                            f"<br><span class='aside'>{rich(g.nodes[k].note)}</span></li>" for k in conc)
+            items = "".join(f"<li><b>{self.link(k)}</b> <span class='yr'>· {self.year(k)}</span>"
+                            f"<div class='muted'>{rich(g.nodes[k].note)}</div></li>" for k in conc)
             self.sections.append(("concurrent", "Around the same time",
-                                  "<p>Not cited by the target: found because they appeared in the same window and "
-                                  f"build on the same parents.</p><ul>{items}</ul>"))
+                                  "<p>Not cited by the target: published in the same window and built on the same "
+                                  f'parents.</p><div class="alts"><ul>{items}</ul></div>', ""))
 
     def rest(self) -> None:
         g = self.g
         drawn = {k for line in g.lines for k in line.best_path} | {g.target}
-
-        def chips(ks):
-            return " ".join(f'<span class="chip">{self.link(k)} <span class="yr">{self.year(k)}</span></span>'
-                            for k in ks)
-
         groups = []
         mot = [e.parent for e in g.edges if e.child == g.target and e.role == "problem_motivation"]
         if mot:
-            groups.append(("Problem context", "Papers the target cites as defining the problem it works on.", mot))
+            groups.append(("Problem context", "cited as defining the problem", mot))
         found = [k for k, n in g.nodes.items() if n.kind == "foundation"]
         if found:
-            groups.append(("Foundations", "Widely used, generic papers: shown once, never traced further.", found))
+            groups.append(("Foundations", "generic, never traced further", found))
         side = [k for k, n in g.nodes.items() if k not in drawn and n.kind in ("ancestor", "origin")]
         if side:
-            groups.append(("Side ancestors", "Kept as lineage but not on a frame's main chain. The ones that feed "
-                           "a drawn paper directly are named in the steps above.", side))
+            groups.append(("Side ancestors", "kept as lineage, off the main chains", side))
         front = [k for k, n in g.nodes.items() if k not in drawn and n.kind == "frontier"]
         if front:
-            groups.append(("Not traced further", "Reached but not read (paper budget or depth limit).", front))
+            groups.append(("Not traced further", "reached but not read", front))
         if not groups:
             return
-        body = "".join(f"<h3>{_e(t)}</h3><p class='aside'>{_e(h)}</p><div class='chips'>{chips(ks)}</div>"
-                       for t, h, ks in groups)
-        self.sections.append(("rest", "Everything else that was kept", body))
+        body = "<p>Kept by the run but left off the main chains.</p>" + "".join(
+            f'<details class="group"><summary>{_e(t)} <span class="yr">({len(ks)}) · {_e(h)}</span></summary>'
+            + "<ul>" + "".join(f"<li>{self.link(k, g.nodes[k].meta.title)} <span class='yr'>· {self.year(k)}</span></li>"
+                               for k in sorted(ks, key=lambda k: (str(g.nodes[k].meta.year or 9999), k)))
+            + "</ul></details>" for t, h, ks in groups)
+        self.sections.append(("rest", "Everything else", body, ""))
 
     def about(self) -> None:
         s = self.g.stats or {}
@@ -272,14 +306,14 @@ paper, on the canvas or in the text, to jump to it. <b>Whole canvas</b> zooms ba
             bits.append(f"{s['llm_calls']} LLM calls")
         ev = s.get("evidence_validation") or {}
         if ev:
-            bits.append(f"{ev.get('exact', 0) + ev.get('repaired', 0)} quotes verified against the source text")
-        body = (f"<p>{_e(' · '.join(bits))}.</p>"
-                "<p>Made with <b>paper-lineage</b>. Roles come from reading each citing sentence; quotes are copied "
-                "verbatim from the papers and checked against their text. Drawing style after Excalidraw: sketches "
-                "by rough.js (MIT), handwriting in Virgil (SIL Open Font License 1.1).</p>")
-        self.sections.append(("about", "About this page", body))
+            bits.append(f"{ev.get('exact', 0) + ev.get('repaired', 0)} quotes checked against the source text")
+        body = (f"<p class='muted'>{_e(' · '.join(bits))}.</p>"
+                "<p class='muted'>Made with paper-lineage. Each relation comes from reading the citing sentence, and "
+                "every quote is copied from the paper and checked against its text. Sketches by rough.js (MIT), "
+                "handwriting in Virgil (SIL OFL 1.1), formulas by Temml (MIT).</p>")
+        self.sections.append(("about", "About this page", body, ""))
 
-    def build(self) -> list[tuple[str, str, str]]:
+    def build(self):
         self.intro()
         for i, line in enumerate(self.g.lines):
             self.line_section(i, line)
@@ -343,26 +377,68 @@ details.contents a:hover{color:var(--navy);text-decoration:underline}
 .reader p,.reader li{font-size:19px;line-height:1.7;margin:0 0 16px}
 .reader ul{padding-left:24px}
 .reader a{color:var(--navy)}
-.lede{font-style:italic;color:var(--muted)}
-.yr{color:var(--muted);font-weight:400}
-.reader .fulltitle{font-size:16px;line-height:1.45;margin-bottom:10px;color:var(--muted)}
-.fulltitle a{color:var(--muted)}
-.reader .aside{font-size:16.5px;color:#444}
-.step{border-left:2px solid transparent;margin-left:-18px;padding-left:16px;transition:border-color .3s}
-.step.on{border-left-color:var(--red)}
-blockquote{margin:6px 0 18px;padding:2px 0 2px 16px;border-left:3px solid #d9d6cf;color:#3d3d3d;font-style:italic;
- font-size:17.5px;line-height:1.6}
-blockquote cite{display:block;font-style:normal;color:var(--muted);font-size:14.5px;margin-top:4px}
+.lede{font-style:italic;color:var(--muted);font-size:17px!important}
+.lede a{color:var(--muted)}
+.yr,.muted{color:var(--muted);font-weight:400}
+.recipe{font-size:22px!important;line-height:1.6!important;margin:6px 0 22px!important}
+.paren{color:#4a4a4a}
+.lead-in{margin-bottom:10px!important}
+.routes{display:flex;flex-direction:column;gap:8px;margin:0 0 22px}
+.route{display:block;text-decoration:none;color:var(--ink);background:#fff;border:1px solid #e3e0d9;
+ border-left:6px solid var(--lc);border-radius:4px;padding:9px 14px}
+.route:hover{border-color:#cfcabf;border-left-color:var(--lc)}
+.route .rl{display:block;font-weight:600;font-size:17px}
+.route .rp{display:block;color:var(--muted);font-size:15.5px;line-height:1.5;margin-top:2px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--lc);border:1.5px solid var(--ink);
+ margin-right:8px;vertical-align:1px}
+.hint{font-size:16px!important;color:var(--muted);line-height:1.6!important}
+.linkish,.evword{font:inherit;color:var(--navy);background:none;border:0;padding:0;cursor:pointer;
+ border-bottom:1px dashed rgba(29,58,138,.45)}
+.evword{cursor:default;border:0;font-style:italic}
+section.line h2::before{content:"";display:inline-block;width:16px;height:16px;border-radius:4px;background:var(--lc);
+ border:2px solid var(--ink);margin-right:12px;vertical-align:2px}
+.takeaway{font-size:20.5px!important;line-height:1.6!important;background:#fff;border:1px solid #e3e0d9;
+ border-left:6px solid var(--lc);border-radius:4px;padding:12px 16px;margin:0 0 6px!important}
+.tl-lead{color:var(--muted);font-size:16.5px!important;margin:26px 0 8px!important}
+.timeline{list-style:none;margin:0 0 10px;padding:0;position:relative}
+.timeline::before{content:"";position:absolute;left:7px;top:14px;bottom:18px;width:3px;background:var(--lc);
+ border-radius:2px}
+.tl{position:relative;padding:2px 0 18px 32px}
+.tl::before{content:"";position:absolute;left:0;top:9px;width:13px;height:13px;border-radius:50%;background:#fff;
+ border:2.5px solid var(--ink);transition:all .25s}
+.tl.on::before{background:var(--red);border-color:var(--red);box-shadow:0 0 0 4px rgba(224,49,49,.18)}
+.tl-head{font-size:19px;line-height:1.45}
+.when{display:inline-block;min-width:44px;color:var(--muted);font-size:15px;font-variant-numeric:tabular-nums}
+.tl-body{font-size:17.5px;line-height:1.6;margin-top:2px}
+.tl-body.muted{font-size:16px;font-style:italic}
+.direct{font-size:15.5px;color:var(--red);margin-top:4px}
+.ext{color:var(--muted)!important;text-decoration:none;font-size:.8em;margin-left:2px}
+.ext:hover{color:var(--navy)!important}
+details.ev{margin:4px 0 0}
+details.ev summary{display:inline-block;cursor:pointer;color:var(--muted);font-size:14px;list-style:none;
+ border:1px solid #e3e0d9;border-radius:99px;padding:0 10px;background:#fff;user-select:none}
+details.ev summary::-webkit-details-marker{display:none}
+details.ev summary::before{content:"❝ "}
+details.ev[open] summary{color:var(--ink);border-color:#cfcabf}
+details.ev blockquote{margin:8px 0 4px}
+.others{font-size:15px!important;color:var(--muted);margin:6px 0 0!important}
+blockquote{margin:6px 0 14px;padding:2px 0 2px 16px;border-left:3px solid #d9d6cf;color:#3d3d3d;font-style:italic;
+ font-size:16.5px;line-height:1.6}
+blockquote cite{display:block;font-style:normal;color:var(--muted);font-size:14px;margin-top:4px}
+.alts{margin:14px 0 0;padding:12px 16px 4px;border:1.5px dashed #b9a8ec;border-radius:6px;background:#fbfaff}
+.alts h4{margin:0 0 6px;font-size:15px;text-transform:uppercase;letter-spacing:.05em;color:#5f3dc4;font-weight:600}
+.alts ul{list-style:none;margin:0;padding:0}
+.alts li{font-size:17px;line-height:1.55;margin:0 0 12px}
+.alts li.on{outline:2px solid rgba(224,49,49,.35);outline-offset:4px;border-radius:2px}
 .mention{font:inherit;color:var(--navy);background:none;border:0;padding:0;cursor:pointer;
  border-bottom:1px dashed rgba(29,58,138,.45)}.mention:hover{border-bottom-style:solid}
-.chip{display:inline-block;border:1px solid #dcd9d2;border-radius:4px;padding:2px 9px;margin:0 6px 8px 0;
- font-size:15.5px;background:#fff}
-.chips{line-height:1.9}
-.routes li{margin-bottom:12px}
-.route{text-decoration:none}
+details.group{border-top:1px solid var(--rule);padding:8px 0}
+details.group summary{cursor:pointer;font-size:17.5px}
+details.group ul{margin:8px 0 4px}
+details.group li{font-size:16px!important;line-height:1.5!important;margin-bottom:6px!important}
 .reader math{font-size:1.07em;font-style:normal}.tex.fallback{font-style:italic}
-.redcircle{border:2px solid var(--red);border-radius:50%;padding:0 6px}
 code{font-size:.85em;background:#efede8;padding:1px 5px;border-radius:3px}
+.site-footer a{color:var(--ink)}
 .site-footer{text-align:center;font:12.5px ui-sans-serif,system-ui,sans-serif;color:var(--muted);padding:6px;
  border-top:1px solid var(--rule)}
 .paper{cursor:pointer}
@@ -375,7 +451,7 @@ code{font-size:.85em;background:#efede8;padding:1px 5px;border-radius:3px}
  .notes{min-width:0}.site-footer{display:none}.brand{display:none}
  .divider{display:none}.reading-nav{padding:10px 18px 6px}.reader{padding:4px 18px 45vh}
  .reader h1{font-size:30px}.reader h2{font-size:27px}.reader p,.reader li{font-size:17.5px}
- .step{margin-left:-10px;padding-left:8px}.counter{display:none}
+ .counter{display:none}.recipe{font-size:19px!important}
  .whole{top:10px;left:10px;padding:8px 10px}}
 """
 
@@ -616,8 +692,8 @@ function currentFocus() {
 }
 function onScroll() {
   const x = currentFocus(); if (!x) return;
-  document.querySelectorAll('.step.on').forEach(s => s.classList.remove('on'));
-  const step = x.closest('.step'); if (step) step.classList.add('on');
+  document.querySelectorAll('.step.on, .alt.on').forEach(s => s.classList.remove('on'));
+  const step = x.closest('.step, .alt'); if (step) step.classList.add('on');
   const sec = x.closest('section'); if (sec) counter.textContent = sec.dataset.title || '';
   setFocus(x.dataset.focus);
 }
@@ -637,6 +713,14 @@ document.querySelectorAll('a.route, details.contents a').forEach(a => a.addEvent
   const t = document.querySelector(a.getAttribute('href')); if (!t) return; ev.preventDefault();
   reader.scrollTo({top: t.offsetTop - 10, behavior: 'smooth'});
   const d = a.closest('details'); if (d) d.removeAttribute('open'); }));
+
+// ---- quotes: folded by default, one switch to open them all
+const allQ = document.getElementById('all-quotes');
+if (allQ) allQ.addEventListener('click', () => {
+  const open = allQ.dataset.open !== '1';
+  document.querySelectorAll('details.ev').forEach(d => { d.open = open; });
+  allQ.dataset.open = open ? '1' : ''; allQ.textContent = open ? 'hide all quotes' : 'show all quotes';
+});
 
 // ---- manual pan / zoom (Excalidraw conventions: wheel pans, ctrl/cmd+wheel or pinch zooms)
 const stage = document.getElementById('stage');
@@ -696,11 +780,13 @@ def render_html(g: LineageGraph) -> str:
     temml_js = _asset("temml.min.js").decode("utf-8")
     temml_css = _asset("Temml-Local.css").decode("utf-8").replace(
         "url('Temml.woff2')", "url(data:font/woff2;base64," + base64.b64encode(_asset("Temml.woff2")).decode() + ")")
-    contents = "".join(f'<li><a href="#{sid}">{rich(title)}</a></li>' for sid, title, _ in sections)
+    contents = "".join(f'<li><a href="#{sid}">{rich(title)}</a></li>' for sid, title, _, _ in sections)
     body = []
-    for idx, (sid, title, inner) in enumerate(sections):
+    for idx, (sid, title, inner, colour) in enumerate(sections):
         tag = "h1" if idx == 0 else "h2"
-        body.append(f'<section id="{sid}" data-title="{_e(plain(title))}">'
+        style = f' style="--lc:{colour}"' if colour else ""
+        cls = ' class="line"' if colour else ""
+        body.append(f'<section id="{sid}"{cls}{style} data-title="{_e(plain(title))}">'
                     f'<{tag} data-focus="{_focus_for(sid)}">{rich(title)}</{tag}>{inner}</section>')
     css = CSS.replace("__VIRGIL__", font)
     return f"""<!doctype html>
@@ -726,7 +812,7 @@ def render_html(g: LineageGraph) -> str:
     <div class="reader" id="reader" tabindex="0"><article>{''.join(body)}</article></div>
   </aside>
 </main>
-<footer class="site-footer">Made with paper-lineage · every link quotes the paper that makes it</footer>
+<footer class="site-footer">Made with paper-lineage · every link quotes the paper that makes it · Design inspired by <a href="https://www.kuant.space/pi/" target="_blank" rel="noopener">Kuan Yi Wang</a></footer>
 <script type="application/json" id="data">{payload}</script>
 <script>/* rough.js 4.6.6, (c) 2019 Preet Shihn, MIT License */
 {rough_js}</script>

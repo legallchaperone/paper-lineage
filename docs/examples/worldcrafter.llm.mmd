@@ -1,0 +1,63 @@
+flowchart LR
+  subgraph L1["base: Helios"]
+    n_n_arXiv_2209_03003["Flow Straight and Fast<br/><small>2022</small>"]:::origin
+    n_n_arXiv_2403_03206["Scaling Rectified Flow Transformers<br/><small>2024</small>"]:::ancestor
+    n_n_arXiv_2503_20314["T2V-14B<br/><small>2025</small>"]:::ancestor
+    n_n_arXiv_2603_04379["Helios<br/><small>2026</small>"]:::ancestor
+  end
+  subgraph L2["ingredient: LagerNVS"]
+    n_n_arXiv_2210_10716["CroCo<br/><small>2022</small>"]:::frontier
+    n_n_arXiv_2312_14132["DUSt3R<br/><small>2023</small>"]:::ancestor
+    n_n_arXiv_2503_11651["VGGT<br/><small>2025</small>"]:::ancestor
+    n_n_arXiv_2603_20176["LagerNVS<br/><small>2026</small>"]:::ancestor
+  end
+  subgraph L3["ingredient: UCPE"]
+    n_n_arXiv_2112_07945["Efficient Geometry-aware 3D Generative…<br/><small>2021</small>"]:::frontier
+    n_n_arXiv_2311_04400["LRM<br/><small>2023</small>"]:::ancestor
+    n_n_arXiv_2410_17242["LVSM<br/><small>2024</small>"]:::ancestor
+    n_n_arXiv_2507_10496["PRoPE<br/><small>2025</small>"]:::ancestor
+    n_n_arXiv_2512_07237["UCPE<br/><small>2025</small>"]:::ancestor
+  end
+  n_n_arXiv_2402_03908["CAPE<br/><small>2024</small>"]:::alternative
+  n_n_arXiv_2402_14817["Cameras as Rays<br/><small>2024</small>"]:::alternative
+  n_n_arXiv_2411_18673["AC3D<br/><small>2024</small>"]:::alternative
+  n_n_arXiv_2503_11647["Recammaster<br/><small>2025</small>"]:::alternative
+  n_n_arXiv_2505_00702["RayZer<br/><small>2025</small>"]:::alternative
+  n_n_arXiv_2506_08009["Self-Forcing<br/><small>2025</small>"]:::alternative
+  n_n_arXiv_2509_22622["LongLive<br/><small>2025</small>"]:::alternative
+  n_n_arXiv_2512_14614["HY-WorldPlay<br/><small>2025</small>"]:::alternative
+  n_n_arXiv_2605_15178["SANA-WM<br/><small>2026</small>"]:::alternative
+  n_n_arXiv_2609_24984["WorldCrafter<br/><small>2026</small>"]:::target
+  n_n_arXiv_2112_07945 -->|idea| n_n_arXiv_2311_04400
+  n_n_arXiv_2210_10716 -->|idea| n_n_arXiv_2312_14132
+  n_n_arXiv_2507_10496 -.->|alt| n_n_arXiv_2402_03908
+  n_n_arXiv_2507_10496 -.->|alt| n_n_arXiv_2402_14817
+  n_n_arXiv_2209_03003 -->|builds on| n_n_arXiv_2403_03206
+  n_n_arXiv_2311_04400 -->|idea| n_n_arXiv_2410_17242
+  n_n_arXiv_2512_07237 -.->|alt| n_n_arXiv_2411_18673
+  n_n_arXiv_2512_07237 -.->|alt| n_n_arXiv_2503_11647
+  n_n_arXiv_2312_14132 -->|idea| n_n_arXiv_2503_11651
+  n_n_arXiv_2403_03206 -->|idea| n_n_arXiv_2503_20314
+  n_n_arXiv_2603_20176 -.->|alt| n_n_arXiv_2505_00702
+  n_n_arXiv_2603_04379 -.->|alt| n_n_arXiv_2506_08009
+  n_n_arXiv_2410_17242 -->|builds on| n_n_arXiv_2507_10496
+  n_n_arXiv_2603_04379 -.->|alt| n_n_arXiv_2509_22622
+  n_n_arXiv_2507_10496 -->|idea| n_n_arXiv_2512_07237
+  n_n_arXiv_2503_20314 -->|builds on| n_n_arXiv_2512_07237
+  n_n_arXiv_2609_24984 -.->|alt| n_n_arXiv_2512_14614
+  n_n_arXiv_2503_20314 -->|builds on| n_n_arXiv_2603_04379
+  n_n_arXiv_2503_11651 -->|builds on| n_n_arXiv_2603_20176
+  n_n_arXiv_2609_24984 -.->|alt| n_n_arXiv_2605_15178
+  n_n_arXiv_2603_04379 -->|builds on| n_n_arXiv_2609_24984
+  n_n_arXiv_2507_10496 -->|idea| n_n_arXiv_2609_24984
+  n_n_arXiv_2603_20176 -->|uses| n_n_arXiv_2609_24984
+  n_n_arXiv_2512_07237 -->|uses| n_n_arXiv_2609_24984
+  classDef target fill:#fde68a,stroke:#b45309,stroke-width:3px,color:#111
+  classDef origin fill:#bbf7d0,stroke:#15803d,color:#111
+  classDef ancestor fill:#e0f2fe,stroke:#0369a1,color:#111
+  classDef frontier fill:#fef9c3,stroke:#a16207,stroke-dasharray:4 3,color:#111
+  classDef foundation fill:#f1f5f9,stroke:#94a3b8,color:#475569
+  classDef alternative fill:#ede9fe,stroke:#7c3aed,stroke-dasharray:4 3,color:#111
+  classDef motivation fill:#f8fafc,stroke:#64748b,stroke-dasharray:2 2,color:#334155
+  classDef descendant fill:#dbeafe,stroke:#1d4ed8,color:#111
+  classDef concurrent fill:#f5f3ff,stroke:#8b5cf6,stroke-dasharray:2 4,color:#111

@@ -28,7 +28,11 @@ def _badge(n: Node) -> str:
 
 
 def _quote(s: str, width: int = 160) -> str:
-    return s if len(s) <= width else s[: width - 3] + "..."
+    """Shorten at a word boundary (never mid-word)."""
+    if len(s) <= width:
+        return s
+    cut = s[: width - 1].rsplit(" ", 1)[0].rstrip(",;:")
+    return cut + "…"
 
 
 def build_renderable(g: LineageGraph, show_evidence: bool = False, full: bool = False):

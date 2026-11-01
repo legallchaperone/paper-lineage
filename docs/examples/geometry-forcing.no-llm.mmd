@@ -1,60 +1,30 @@
-flowchart TB
+flowchart LR
   subgraph L1["technique: REPA"]
     n_arXiv_1806_07366["Neural Ordinary Differential Equations<br/><small>2018</small>"]:::frontier
-    n_arXiv_2006_11239["DDPM<br/><small>2020</small>"]:::foundation
-    n_S2_bc022dbb37b1bbf3905a7404d19c03ccbf6b81a8["iGPT<br/><small>2020</small>"]:::origin
-    n_arXiv_2011_13456["Score-Based Generative Modeling through <br/><small>2020</small>"]:::ancestor
-    n_arXiv_2206_00364["EDM<br/><small>2022</small>"]:::foundation
-    n_arXiv_2212_09748["DiT<br/><small>2022</small>"]:::foundation
-    n_arXiv_2303_09769["Denoising Diffusion Autoencoders are Uni<br/><small>2023</small>"]:::ancestor
+    n_arXiv_2011_13456["Score-Based Generative Modeling<br/><small>2020</small>"]:::ancestor
     n_arXiv_2401_08740["SiT<br/><small>2024</small>"]:::ancestor
     n_arXiv_2410_06940["REPA<br/><small>2024</small>"]:::ancestor
   end
   subgraph L2["base: DFoT"]
-    n_arXiv_2010_02502["DDIM<br/><small>2020</small>"]:::foundation
-    n_arXiv_2012_09841["VQGAN<br/><small>2020</small>"]:::foundation
-    n_arXiv_2202_04200["MaskGIT<br/><small>2022</small>"]:::frontier
-    n_arXiv_2210_02399["C-ViViT<br/><small>2022</small>"]:::frontier
-    n_arXiv_2212_05199["MAGVIT<br/><small>2022</small>"]:::frontier
-    n_arXiv_2307_06304["Patch n' Pack<br/><small>2023</small>"]:::origin
-    n_arXiv_2310_05737["Language Model Beats Diffusion -- Tokeni<br/><small>2023</small>"]:::ancestor
-    n_arXiv_2311_03079["CogVLM<br/><small>2023</small>"]:::ancestor
     n_arXiv_2407_01392["Diffusion Forcing<br/><small>2024</small>"]:::origin
-    n_arXiv_2408_06072["CogVideoX<br/><small>2024</small>"]:::ancestor
     n_arXiv_2502_06764["DFoT<br/><small>2025</small>"]:::ancestor
-    n_bib_1d4aca7164b4["Vicuna<br/><small></small>"]:::origin
   end
   subgraph L3["base: VGGT"]
-    n_bib_7c2ee13f451f["The Weiszfeld Algorithm<br/><small>2011</small>"]:::origin
-    n_S2_e7d0c37f4f3589a3b787f39e8307704da5ed8d6c["COLMAP<br/><small>2016</small>"]:::origin
-    n_arXiv_1712_07629["SuperPoint<br/><small>2017</small>"]:::frontier
-    n_arXiv_1810_10066["A Fusion Approach for Multi-Frame Optica<br/><small>2018</small>"]:::frontier
-    n_arXiv_1906_06195["R2D2<br/><small>2019</small>"]:::frontier
-    n_bib_87126c0a8e2c["D2-Net<br/><small>2019</small>"]:::origin
-    n_arXiv_2003_08348["Multi-View Optimization of Local Feature<br/><small>2020</small>"]:::frontier
     n_arXiv_2003_12039["RAFT<br/><small>2020</small>"]:::origin
-    n_arXiv_2108_08291["PixSfM<br/><small>2021</small>"]:::ancestor
-    n_arXiv_2204_04153["PiPs<br/><small>2022</small>"]:::ancestor
-    n_arXiv_2210_10716["CroCo<br/><small>2022</small>"]:::origin
     n_arXiv_2307_07635["CoTracker<br/><small>2023</small>"]:::ancestor
-    n_arXiv_2312_04563["VGGSfM<br/><small>2023</small>"]:::ancestor
-    n_arXiv_2312_14132["DUSt3R<br/><small>2023</small>"]:::ancestor
     n_arXiv_2503_11651["VGGT<br/><small>2025</small>"]:::ancestor
   end
-  n_arXiv_2507_07982["Geometry Forcing<br/><small>2025</small>"]:::target
   n_S2_2149a87316c366f70413e6aafd956e92740efe14["An introduction to ray tracing<br/><small>1993</small>"]:::motivation
   n_arXiv_1803_10122["World Models<br/><small>2018</small>"]:::motivation
+  n_arXiv_2206_01714["Compositional Visual Generation<br/><small>2022</small>"]:::alternative
   n_arXiv_2302_11552["Reduce, Reuse, Recycle<br/><small>2023</small>"]:::alternative
-  n_arXiv_2206_01714["Compositional Visual Generation with Com<br/><small>2022</small>"]:::alternative
   n_arXiv_2303_04137["Diffusion policy<br/><small>2023</small>"]:::alternative
   n_arXiv_2305_09515["AR-Diffusion<br/><small>2023</small>"]:::alternative
   n_arXiv_2501_13928["Fast3R<br/><small>2025</small>"]:::alternative
+  n_arXiv_2507_07982["Geometry Forcing<br/><small>2025</small>"]:::target
+  n_arXiv_2511_18991["Do View-Consistent Representations Matte<br/><small>2025</small>"]:::descendant
   n_arXiv_2603_20169["EgoForge<br/><small>2026</small>"]:::descendant
   n_arXiv_2603_26193["MemCam<br/><small>2026</small>"]:::descendant
-  n_arXiv_2511_18991["Do View-Consistent Representations Matte<br/><small>2025</small>"]:::descendant
-  n_arXiv_2506_05284["Video World Models with Long-term Spatia<br/><small>2025</small>"]:::concurrent
-  n_arXiv_2510_03198["Memory Forcing<br/><small>2025</small>"]:::concurrent
-  n_arXiv_2506_08456["Improving Motion in Image-to-Video Model<br/><small>2025</small>"]:::concurrent
   n_arXiv_2503_11651 -->|builds on| n_arXiv_2507_07982
   n_arXiv_2502_06764 -->|builds on| n_arXiv_2507_07982
   n_arXiv_2410_06940 -->|idea| n_arXiv_2507_07982
@@ -62,52 +32,16 @@ flowchart TB
   n_S2_2149a87316c366f70413e6aafd956e92740efe14 -.-> n_arXiv_2507_07982
   n_arXiv_1803_10122 -.-> n_arXiv_2507_07982
   n_arXiv_2407_01392 -->|builds on| n_arXiv_2502_06764
-  n_arXiv_2212_09748 -->|uses| n_arXiv_2502_06764
-  n_arXiv_2408_06072 -->|builds on| n_arXiv_2502_06764
-  n_arXiv_2010_02502 -->|uses| n_arXiv_2502_06764
   n_arXiv_2502_06764 -.->|alt| n_arXiv_2302_11552
   n_arXiv_2502_06764 -.->|alt| n_arXiv_2206_01714
   n_arXiv_2407_01392 -.->|alt| n_arXiv_2303_04137
   n_arXiv_2407_01392 -.->|alt| n_arXiv_2305_09515
   n_arXiv_2401_08740 -->|builds on| n_arXiv_2410_06940
-  n_arXiv_2212_09748 -->|builds on| n_arXiv_2410_06940
-  n_arXiv_2303_09769 -->|builds on| n_arXiv_2410_06940
-  n_arXiv_2006_11239 -->|builds on| n_arXiv_2410_06940
-  n_arXiv_2312_14132 -->|builds on| n_arXiv_2503_11651
-  n_arXiv_2312_04563 -->|builds on| n_arXiv_2503_11651
   n_arXiv_2307_07635 -->|builds on| n_arXiv_2503_11651
   n_arXiv_2503_11651 -.->|alt| n_arXiv_2501_13928
-  n_arXiv_2212_09748 -->|builds on| n_arXiv_2401_08740
   n_arXiv_2011_13456 -->|builds on| n_arXiv_2401_08740
   n_arXiv_2003_12039 -->|builds on| n_arXiv_2307_07635
-  n_S2_e7d0c37f4f3589a3b787f39e8307704da5ed8d6c -->|builds on| n_arXiv_2312_04563
-  n_arXiv_2108_08291 -->|builds on| n_arXiv_2312_04563
-  n_arXiv_2307_07635 -->|builds on| n_arXiv_2312_04563
-  n_arXiv_2204_04153 -->|builds on| n_arXiv_2312_04563
-  n_S2_bc022dbb37b1bbf3905a7404d19c03ccbf6b81a8 -->|idea| n_arXiv_2303_09769
-  n_arXiv_2011_13456 -->|builds on| n_arXiv_2303_09769
-  n_arXiv_2206_00364 -->|uses| n_arXiv_2303_09769
-  n_arXiv_2212_09748 -->|uses| n_arXiv_2303_09769
-  n_arXiv_2210_10716 -->|idea| n_arXiv_2312_14132
-  n_arXiv_2108_08291 -->|builds on| n_arXiv_2312_14132
-  n_bib_7c2ee13f451f -->|builds on| n_arXiv_2312_14132
-  n_arXiv_2003_12039 -->|builds on| n_arXiv_2204_04153
-  n_arXiv_1810_10066 -->|builds on| n_arXiv_2204_04153
-  n_arXiv_2006_11239 -->|builds on| n_arXiv_2011_13456
   n_arXiv_1806_07366 -->|builds on| n_arXiv_2011_13456
-  n_arXiv_2003_08348 -->|builds on| n_arXiv_2108_08291
-  n_arXiv_1712_07629 -->|builds on| n_arXiv_2108_08291
-  n_bib_87126c0a8e2c -->|builds on| n_arXiv_2108_08291
-  n_arXiv_1906_06195 -->|builds on| n_arXiv_2108_08291
-  n_arXiv_2212_09748 -->|builds on| n_arXiv_2408_06072
-  n_arXiv_2310_05737 -->|builds on| n_arXiv_2408_06072
-  n_arXiv_2311_03079 -->|builds on| n_arXiv_2408_06072
-  n_arXiv_2307_06304 -->|idea| n_arXiv_2408_06072
-  n_arXiv_2212_05199 -->|builds on| n_arXiv_2310_05737
-  n_arXiv_2202_04200 -->|idea| n_arXiv_2310_05737
-  n_arXiv_2012_09841 -->|uses| n_arXiv_2310_05737
-  n_arXiv_2210_02399 -->|uses| n_arXiv_2310_05737
-  n_bib_1d4aca7164b4 -->|builds on| n_arXiv_2311_03079
   n_arXiv_2507_07982 -->|builds on| n_arXiv_2603_20169
   n_arXiv_2507_07982 -->|builds on| n_arXiv_2603_26193
   n_arXiv_2507_07982 -->|idea| n_arXiv_2511_18991

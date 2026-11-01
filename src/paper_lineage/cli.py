@@ -112,7 +112,14 @@ def main(
         graph.stats["llm_calls"] = llm.calls
         graph.stats["llm_tokens"] = dict(llm.usage)
 
+    from .quality import check as quality_check
+    issues = quality_check(graph)
+    graph.stats["quality_issues"] = len(issues)
+    if issues:
+        err.print(f"[yellow]{len(issues)} output-quality issue(s); run with -v to list them[/yellow]")
     if verbose:
+        for i in issues:
+            err.print(f"[yellow]quality:[/yellow] {i}")
         for d in graph.log:
             err.print(f"[dim]{d}[/dim]")
     _emit(graph, fmt, output or Path(f"lineage-{arxiv_id.replace('/', '_')}"), evidence, full)

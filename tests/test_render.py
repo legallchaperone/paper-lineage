@@ -59,7 +59,19 @@ def test_html_is_self_contained_sketch_page():
     assert "http://" not in h.split("<script")[0].split("<style>")[0]
     for sid in ("intro", "line-0", "line-1", "line-2", "differently", "rest", "about"):
         assert f'<section id="{sid}"' in h
-    assert h.count('class="step"') >= 14                        # one step per paper on the chains
+    g = wc_graph()
+    assert h.count('class="step tl"') == sum(len(line.best_path) - 1 for line in g.lines) == 13
+    assert 'class="recipe"' in h and "is built on" in h          # the answer comes first
+    assert h.count('<details class="ev">') >= 14                # quotes folded, one per claim
+    assert "Design inspired by" in h and "kuant.space/pi" in h
+
+
+def test_alternative_quotes_are_attributed_to_the_contrasting_paper():
+    import re
+    h = render_html(wc_graph())
+    # Self-Forcing is an alternative that Helios contrasts itself with: the sentence is Helios's
+    li = re.search(r'<li class="alt"[^>]*>(?:(?!</li>).)*Self-Forcing(?:(?!</li>).)*</li>', h, re.S).group(0)
+    assert "— Helios" in li and "— Self-Forcing" not in li
     assert "building on top of the VGGT model" in h             # evidence quoted
 
 

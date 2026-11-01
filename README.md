@@ -145,6 +145,22 @@ python3 lineage.pyz --render lineage-2609.24984.json -f html
    (fetched, parsed and classified the same way). `--concurrent`: bibliographic coupling — papers
    within ±90 days that cite ≥2 of the target's direct parents.
 
+## Output quality guarantees
+
+Every graph, freshly computed or loaded with `--render`, goes through one normalization pass
+(`paper_lineage/quality.py`) before anything is rendered, and `check()` verifies the result:
+
+- "what was inherited" summaries are clean phrases that complete *X builds on Y: …* (the LLM is given
+  that exact format; the normalizer enforces it for any model and for older runs);
+- display names are never cut mid-word and are unique;
+- every lineage link has its evidence sentence, attributed to the paper that wrote it;
+- formulas are typeset (MathML) in the page and shown as Unicode in the terminal, never as raw LaTeX;
+- output is byte-for-byte deterministic.
+
+`tests/test_quality.py` asserts these as invariants on several real runs (LLM and heuristic) and on a
+deliberately adversarial synthetic graph, so a fix for one paper cannot silently break another.
+The CLI reports any violation (`-v` lists them).
+
 ## Quality and cost
 
 - First generation is the most reliable (the target's text is rich and specific); deeper levels rely

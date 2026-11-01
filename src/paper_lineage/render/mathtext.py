@@ -57,27 +57,37 @@ def _balanced(s: str) -> bool:
     return depth == 0
 
 
-def to_unicode(tex: str) -> str:
-    """Best-effort readable form of a LaTeX fragment (used as fallback and for SVG/tooltips)."""
-    t = tex
-    for _ in range(4):
-        t = re.sub(r"\\(?:%s)\s*\{([^{}]*)\}" % _FORMAT, r"\1", t)
-        t = re.sub(r"\\(?:hat|widehat)\s*\{([^{}]*)\}", lambda m: m.group(1) + "\u0302", t)
-        t = re.sub(r"\\(?:tilde|widetilde)\s*\{([^{}]*)\}", lambda m: m.group(1) + "\u0303", t)
-        t = re.sub(r"\\(?:bar|overline)\s*\{([^{}]*)\}", lambda m: m.group(1) + "\u0304", t)
-        t = re.sub(r"\\(?:vec)\s*\{([^{}]*)\}", lambda m: m.group(1) + "\u20d7", t)
-        t = re.sub(r"\\(?:dot)\s*\{([^{}]*)\}", lambda m: m.group(1) + "\u0307", t)
-        t = re.sub(r"\\frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}", r"(\1)/(\2)", t)
-        t = re.sub(r"\\sqrt\s*\{([^{}]*)\}", r"√(\1)", t)
-    t = re.sub(r"\\([A-Za-z]+|[%{}_&#|])", lambda m: _SYMBOLS.get(m.group(1), m.group(1) if len(m.group(1)) > 1 else ""),
-               t)
-    t = re.sub(r"\\[,;:! ]", " ", t)
+_SEP = "\u2063"   # invisible separator: keeps unwrapped groups from gluing onto neighbouring commands
+_SIZING = r"left|right|bigl|bigr|Bigl|Bigr|biggl|biggr|big|Big|bigg|Bigg|displaystyle|textstyle|scriptstyle|limits|nolimits"
 
+
+def to_unicode(tex: str) -> str:
+    """Best-effort readable form of a LaTeX fragment (fallback text, SVG labels, tooltips)."""
+    t = re.sub(r"\\(?:%s)(?![A-Za-z])" % _SIZING, _SEP, tex)
+    t = re.sub(r"\\(?:q?quad|[,;:! ])", " ", t)
+    wrap = lambda pat, f: re.sub(pat, lambda m: _SEP + f(m) + _SEP, t)   # noqa: E731
+    for _ in range(6):   # innermost groups first; repeat for nesting
+        before = t
+        t = wrap(r"\\(?:%s)\s*\{([^{}]*)\}" % _FORMAT, lambda m: m.group(1))
+        t = wrap(r"\\(?:hat|widehat)\s*\{([^{}]*)\}", lambda m: m.group(1) + "\u0302")
+        t = wrap(r"\\(?:tilde|widetilde)\s*\{([^{}]*)\}", lambda m: m.group(1) + "\u0303")
+        t = wrap(r"\\(?:bar|overline)\s*\{([^{}]*)\}", lambda m: m.group(1) + "\u0304")
+        t = wrap(r"\\vec\s*\{([^{}]*)\}", lambda m: m.group(1) + "\u20d7")
+        t = wrap(r"\\dot\s*\{([^{}]*)\}", lambda m: m.group(1) + "\u0307")
+        t = wrap(r"\\frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}", lambda m: f"({m.group(1)})/({m.group(2)})")
+        t = wrap(r"\\sqrt\s*\{([^{}]*)\}", lambda m: f"√({m.group(1)})")
+        t = re.sub(r"([_^])\{([^{}]*)\}", lambda m: m.group(1) + "\u2064" + m.group(2) + "\u2065", t)
+        if t == before:
+            break
+    t = t.replace("\u2064", "{").replace("\u2065", "}")
+    t = re.sub(r"\\([A-Za-z]+|[%{}_&#|])",
+               lambda m: _SYMBOLS.get(m.group(1), m.group(1) if len(m.group(1)) > 1 else ""), t)
+    t = t.replace("...", "…")
     t = re.sub(r"_\{([^{}]*)\}|_(\w)", lambda m: _script(m.group(1) if m.group(1) is not None else m.group(2),
                                                          _SUB, _SUB_KEYS, "_"), t)
     t = re.sub(r"\^\{([^{}]*)\}|\^(\w)", lambda m: _script(m.group(1) if m.group(1) is not None else m.group(2),
                                                            _SUP, _SUP_KEYS, "^"), t)
-    t = t.replace("{", "").replace("}", "")
+    t = t.replace("{", "").replace("}", "").replace(_SEP, "")
     return re.sub(r"\s{2,}", " ", t).strip()
 
 

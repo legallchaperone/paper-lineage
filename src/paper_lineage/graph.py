@@ -135,7 +135,9 @@ class LineageGraph:
             assigned.update(members)
             line = Line(head=e.parent, role=e.role, members=members, best_path=chain + [self.target],
                         weight=round(self.edge_score(e) + up_score + self.HOP_PENALTY, 3))
-            line.label = f"{ROLE_LINE_LABEL.get(e.role, e.role)}: {self.nodes[e.parent].meta.short_name}"
+            from .render.mathtext import plain   # display label: formulas as Unicode, never raw LaTeX
+
+            line.label = f"{ROLE_LINE_LABEL.get(e.role, e.role)}: {plain(self.nodes[e.parent].meta.short_name)}"
             lines.append(line)
         self.lines = lines
 
@@ -185,6 +187,9 @@ class LineageGraph:
             g.edges.append(Edge(**{k: v for k, v in ed.items() if k in edge_fields}))
         g.stats = d.get("stats", {})
         g.log = d.get("decisions", [])
+        from .quality import normalize
+
+        normalize(g)
         g.compute_lines()
         g.choose_spine("none" if d.get("spine") is None and "disabled" in d.get("spine_reason", "") else "auto")
         return g

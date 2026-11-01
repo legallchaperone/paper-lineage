@@ -10,6 +10,7 @@ from datetime import date
 from typing import Callable, Protocol
 
 from .graph import LineageGraph
+from .quality import normalize
 from .heuristics import HeuristicConfig, cosine, score_candidate
 from .models import LINEAGE_ROLES, ROLE_WEIGHT, Candidate, Classification, Edge, Node, PaperMeta, ParsedPaper
 from .parse import norm_ws
@@ -171,6 +172,7 @@ class Engine:
             elif n.kind == "ancestor" and not n.expanded:
                 n.kind = "origin" if not n.note.startswith("depth") else "frontier"
         g.prune()
+        normalize(g)
         g.compute_lines()
         g.choose_spine(cfg.spine)
         g.stats.update({"expanded": expanded, "classified_candidates": n_class,

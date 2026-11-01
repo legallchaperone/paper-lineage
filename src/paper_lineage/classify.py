@@ -7,6 +7,7 @@ import re
 
 from .heuristics import SECTION_WEIGHT, heuristic_classification
 from .llm import LLM
+from .quality import clean_summary
 from .models import LINEAGE_ROLES, ROLES, Candidate, Classification, PaperMeta
 
 log = logging.getLogger(__name__)
@@ -129,9 +130,16 @@ class LLMClassifier:
         lines += [
             "",
             'Return: {"results": [{"id": "C1", "role": "...", "directness": 0, "relevance": 0, '
-            '"inherited": "<=15 words: what the CHILD took from it (empty for non-lineage roles)", '
+            '"inherited": "<what the CHILD took from it>", '
             '"evidence": "<verbatim sentence or clause from the list above>"}, ...]} '
             "with one entry per candidate.",
+            "",
+            'Format of "inherited" (lineage roles only, otherwise ""): a lower-case noun phrase of at most 15 words '
+            'that completes the sentence "<CHILD> builds on <CANDIDATE>: ___". Name the concrete thing taken '
+            "(a model, module, loss, representation, training recipe), not a judgement. No trailing period, do not "
+            "start with \"it\" or a verb, do not repeat the CHILD's name.",
+            'Good: "per-frame independent noise levels for autoregressive video diffusion". '
+            'Bad: "It builds on this work." / "Important foundation." / "Uses VGGT.".',
         ]
         return "\n".join(lines)
 
@@ -173,7 +181,7 @@ class LLMClassifier:
         sentences = [x.sentence for x in c.contexts]
         evidence, status = validate_evidence(str(r.get("evidence", "")), sentences)
         self.stats[status] += 1
-        inherited = " ".join(str(r.get("inherited", "")).split()[:20])
+        inherited = clean_summary(r.get("inherited", ""))
         if evidence is None:
             # Unverifiable claim: never keep it as lineage.
             if role in LINEAGE_ROLES or role == "alternative":

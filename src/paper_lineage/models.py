@@ -72,13 +72,10 @@ class PaperMeta:
 
 
 def short_name(title: str) -> str:
-    """A compact display name: the part before ':' if it looks like a method name."""
-    t = (title or "").strip()
-    if ":" in t:
-        head = t.split(":", 1)[0].strip()
-        if 0 < len(head) <= 42:
-            return head
-    return t if len(t) <= 48 else t[:45].rstrip() + "..."
+    """Compact display name (see quality.short_title: never cut mid-word)."""
+    from .quality import short_title
+
+    return short_title(title)
 
 
 @dataclass
