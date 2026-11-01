@@ -147,7 +147,9 @@ class _Builder:
                 self.cites.append((start, self.len, keys))
             return
         if el.name == "math":
-            self.add(el.get("alttext", "") or "[math]")
+            # keep formulas as delimited LaTeX so the report can typeset them (instead of raw code)
+            tex = " ".join((el.get("alttext") or "").split())
+            self.add(f"${tex.replace('$', '')}$" if tex else "[math]")
             return
         if "ltx_note" in cls or "ltx_tag_note" in cls or el.name in ("script", "style"):
             return  # footnotes would glue foreign text into sentences

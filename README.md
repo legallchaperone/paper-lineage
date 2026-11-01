@@ -95,11 +95,14 @@ lineage <arxiv url or id> [options]
   -v, --verbose           log every keep/drop decision with its reason
 ```
 
-`-f html` writes a self-contained interactive page (no internet needed to view it): each line of
-work is a colored lane flowing left-to-right into your paper, with alternatives hanging below the paper
-they belong to. Drag to pan, scroll/pinch to zoom, click any paper to see the exact sentences that
-justify each link, its own parents and its alternatives — every kept paper is reachable from the side
-panel, even the ones not drawn. Toggles show side parents and links between lines.
+`-f html` writes a self-contained page in a hand-drawn, Excalidraw-like style (no internet needed to
+view it). On the left, a sketchy canvas: each line of work is a titled frame, papers are hand-drawn boxes
+and labelled arrows flow left-to-right into your paper, with "done differently" alternatives as dashed
+boxes. On the right, a walkthrough with one section per frame and one step per paper: *X is built on Y:
+what it inherited*, followed by the sentence quoted from X. Scrolling the text glides the canvas to the
+frame and circles the paper being discussed; click a paper on either side to jump to it, drag/pinch to
+pan and zoom, **Whole canvas** to zoom out. Formulas in quotes and titles are typeset (MathML), never
+shown as raw LaTeX.
 
 The terminal (`tree`) and `mermaid` views show only the main chains by default; add `--full` for
 everything. `-f json` keeps the full graph plus the decision log (`decisions`), which is the first

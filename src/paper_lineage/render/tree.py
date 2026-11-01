@@ -7,6 +7,7 @@ from rich.text import Text
 
 from ..graph import LineageGraph
 from ..models import Node
+from .mathtext import plain
 
 KIND_STYLE = {
     "target": "bold magenta", "origin": "bold green", "ancestor": "cyan", "foundation": "dim",
@@ -18,7 +19,7 @@ ROLE_VERB = {"builds_on": "built on", "technique_source": "idea", "component": "
 
 def _name(n: Node) -> str:
     y = n.meta.year or "?"
-    nm = n.meta.short_name
+    nm = plain(n.meta.short_name)
     return f"{nm} ({y})"
 
 
@@ -35,7 +36,7 @@ def build_renderable(g: LineageGraph, show_evidence: bool = False, full: bool = 
     out: list = []
     head = Text()
     head.append("Lineage of ", style="bold")
-    head.append(f"{tgt.meta.title} ({tgt.meta.year})", style=KIND_STYLE["target"])
+    head.append(f"{plain(tgt.meta.title)} ({tgt.meta.year})", style=KIND_STYLE["target"])
     if tgt.meta.url:
         head.append(f"  {tgt.meta.url}", style="dim")
     out.append(head)
@@ -67,7 +68,7 @@ def build_renderable(g: LineageGraph, show_evidence: bool = False, full: bool = 
             others = [e for e in g.parents(key) if e.parent not in chain]
             if others:
                 o = Text("  │   + also: ", style="dim")
-                o.append(", ".join(f"{g.nodes[e.parent].meta.short_name} ({ROLE_VERB.get(e.role, e.role)})"
+                o.append(", ".join(f"{plain(g.nodes[e.parent].meta.short_name)} ({ROLE_VERB.get(e.role, e.role)})"
                                    for e in others), style="dim")
                 out.append(o)
             for e in g.children(key, lineage_only=False):
@@ -80,10 +81,10 @@ def build_renderable(g: LineageGraph, show_evidence: bool = False, full: bool = 
             arrow = Text("  │ ", style="dim")
             arrow.append(f"↓ {ROLE_VERB.get(e.role, e.role) if e else ''}", style="bold" if is_spine else "")
             if e and e.inherited:
-                arrow.append(f": {e.inherited}", style="italic")
+                arrow.append(f": {plain(e.inherited)}", style="italic")
             out.append(arrow)
             if show_evidence and e and e.evidence:
-                out.append(Text(f"  │     “{_quote(e.evidence)}”", style="dim italic"))
+                out.append(Text(f"  │     “{_quote(plain(e.evidence))}”", style="dim italic"))
         # other members of this line not on the chain
         extra = [k for k in line.members if k not in chain]
         if extra and full:
@@ -105,7 +106,7 @@ def build_renderable(g: LineageGraph, show_evidence: bool = False, full: bool = 
                 t.append("  [concurrent]", style="dim")
             out.append(t)
             if show_evidence and e.evidence:
-                out.append(Text(f"      “{_quote(e.evidence)}”", style="dim italic"))
+                out.append(Text(f"      “{_quote(plain(e.evidence))}”", style="dim italic"))
         out.append(Text(""))
     found = [n for n in g.nodes.values() if n.kind == "foundation"]
     if found:
@@ -119,10 +120,10 @@ def build_renderable(g: LineageGraph, show_evidence: bool = False, full: bool = 
             t = Text("  ▸ ", style="bold blue")
             t.append(_name(n), style="bold blue")
             if e and e.inherited:
-                t.append(f": {e.inherited}", style="italic")
+                t.append(f": {plain(e.inherited)}", style="italic")
             out.append(t)
             if show_evidence and e and e.evidence:
-                out.append(Text(f"      “{_quote(e.evidence)}”", style="dim italic"))
+                out.append(Text(f"      “{_quote(plain(e.evidence))}”", style="dim italic"))
     conc = [n for n in g.nodes.values() if n.kind == "concurrent"]
     if conc:
         out.append(Text("Concurrent work (same time window, shares the target's parents):", style="bold"))

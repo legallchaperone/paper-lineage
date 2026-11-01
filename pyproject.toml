@@ -28,3 +28,6 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = ["network: hits arXiv / Semantic Scholar (skipped unless LINEAGE_NETWORK_TESTS=1)"]
+
+[tool.setuptools.package-data]
+paper_lineage = ["render/assets/*"]

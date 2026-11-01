@@ -49,8 +49,28 @@ def test_html_escapes_and_contains_evidence():
     g.nodes["arXiv:3"].meta.title = 'Evil </script><script>alert(1)</script>'
     h2 = render_html(g)
     assert "</script><script>alert(1)" not in h2           # titles cannot break out of the data block
-    assert "esc(n.title)" in h2                              # and are HTML-escaped when shown
-    assert "<script src" not in h                         # self-contained, works offline
+    assert "Evil &lt;/script&gt;" in h2                      # and are HTML-escaped when shown
+
+
+def test_html_is_self_contained_sketch_page():
+    h = render_html(wc_graph())
+    assert "font/woff2;base64," in h and "var rough=" in h      # Virgil + rough.js embedded
+    assert "<script src" not in h                                # no external scripts: works offline
+    assert "http://" not in h.split("<script")[0].split("<style>")[0]
+    for sid in ("intro", "line-0", "line-1", "line-2", "differently", "rest", "about"):
+        assert f'<section id="{sid}"' in h
+    assert h.count('class="step"') >= 14                        # one step per paper on the chains
+    assert "building on top of the VGGT model" in h             # evidence quoted
+
+
+def test_formulas_are_typeset_not_raw_but_evidence_stays_verbatim():
+    import re
+    g = wc_graph()
+    h = render_html(g)
+    visible = re.sub(r'<script.*?</script>|<style.*?</style>|data-tex="[^"]*"', "", h, flags=re.S)
+    assert not re.search(r"\\(?:math\w*|hat|text|left|right)\{", visible)    # no raw LaTeX shown
+    assert h.count('class="tex"') >= 15 and "temml" in h
+    assert any("\\mathcal" in e.evidence for e in g.edges)               # stored evidence untouched
 
 
 # --- real run (WorldCrafter, arXiv:2609.24984, LLM mode): 80 papers, 3 lines --------------------------
@@ -89,3 +109,20 @@ def test_compact_views_draw_only_main_chains():
     assert mm.count(":::") == len(keep)
     out = render_tree(g)
     assert "more papers in this line" in out and "also in this line" not in out
+
+
+def test_output_is_deterministic_across_processes(tmp_path):
+    import hashlib
+    import os
+    import subprocess
+    import sys
+    from conftest import FIX
+    digests = set()
+    for seed in ("1", "2"):
+        out = tmp_path / f"r{seed}"
+        env = {**os.environ, "PYTHONHASHSEED": seed}
+        subprocess.run([sys.executable, "-m", "paper_lineage.cli", "--render",
+                        str(FIX / "worldcrafter_2609.24984.graph.json"), "-f", "html", "-f", "json", "-o", str(out)],
+                       check=True, env=env, capture_output=True)
+        digests.add(hashlib.md5((out.with_suffix(".html").read_bytes() + out.with_suffix(".json").read_bytes())).hexdigest())
+    assert len(digests) == 1

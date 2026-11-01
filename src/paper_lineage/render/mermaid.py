@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 
 from ..graph import LineageGraph
+from .mathtext import plain
 
 ROLE_LABEL = {"builds_on": "builds on", "technique_source": "idea", "component": "uses",
               "problem_motivation": "motivates"}
@@ -15,6 +16,7 @@ def _id(key: str) -> str:
 
 
 def _esc(s: str) -> str:
+    s = plain(s)
     return s.replace('"', "'").replace("[", "(").replace("]", ")").replace("<", "‹").replace(">", "›")
 
 

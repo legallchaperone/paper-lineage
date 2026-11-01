@@ -130,8 +130,8 @@ class LineageGraph:
         scored = sorted(real_heads, key=lambda e: (-(self.edge_score(e) + chains[e.parent][1]), -e.score))
         for e in scored:
             chain, up_score = chains[e.parent]
-            members = [m for m in sorted({e.parent} | anc_of[e.parent], key=self._date) if m not in assigned]
-            members = sorted(set(members) | set(chain), key=self._date)
+            members = [m for m in sorted({e.parent} | anc_of[e.parent], key=self._order) if m not in assigned]
+            members = sorted(set(members) | set(chain), key=self._order)
             assigned.update(members)
             line = Line(head=e.parent, role=e.role, members=members, best_path=chain + [self.target],
                         weight=round(self.edge_score(e) + up_score + self.HOP_PENALTY, 3))
@@ -156,6 +156,10 @@ class LineageGraph:
             return
         self.spine = top.best_path
         self.spine_reason = f"{top.label} dominates (weight {top.weight:.1f})"
+
+    def _order(self, key: str) -> tuple[str, str]:
+        """Chronological, with a stable tie-break (set iteration order varies between processes)."""
+        return (self._date(key), key)
 
     def _date(self, key: str) -> str:
         n = self.nodes.get(key)
@@ -192,7 +196,7 @@ class LineageGraph:
             "spine": self.spine,
             "spine_reason": self.spine_reason,
             "lines": [line.to_dict() for line in self.lines],
-            "nodes": [n.to_dict() for n in sorted(self.nodes.values(), key=lambda n: self._date(n.key))],
+            "nodes": [n.to_dict() for n in sorted(self.nodes.values(), key=lambda n: self._order(n.key))],
             "edges": [e.to_dict() for e in self.edges],
             "stats": self.stats,
             "decisions": self.log,
