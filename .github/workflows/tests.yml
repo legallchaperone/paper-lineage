@@ -11,10 +11,13 @@ jobs:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      # uv installs standalone CPython builds, which exist for every supported version on any runner
+      # image (actions/setup-python has no 3.9 build for Ubuntu 26.04).
+      - uses: astral-sh/setup-uv@v6
         with:
           python-version: ${{ matrix.python-version }}
-      - run: pip install -e '.[dev]'
+          activate-environment: true
+      - run: uv pip install -e '.[dev]'
       - run: pytest -q
       - name: tests also pass with the stdlib HTML parser (what lineage.pyz uses)
         run: LINEAGE_HTML_PARSER=html.parser pytest -q
@@ -23,11 +26,20 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.12"
+          activate-environment: true
+      - run: uv pip install pip
       - run: scripts/build_pyz.sh
-      - run: python3 dist/lineage.pyz --help
+      - name: the single-file app runs on the oldest supported Python, with no packages installed
+        run: |
+          uv python install 3.9
+          PY39="$(uv python find 3.9)"
+          env -i PATH=/usr/bin:/bin HOME="$HOME" "$PY39" dist/lineage.pyz --help
+          env -i PATH=/usr/bin:/bin HOME="$HOME" "$PY39" dist/lineage.pyz \
+            --render tests/fixtures/worldcrafter_2609.24984.graph.json -f html -o /tmp/check
+          grep -q 'class="recipe"' /tmp/check.html
       - uses: actions/upload-artifact@v4
         with:
           name: lineage.pyz
