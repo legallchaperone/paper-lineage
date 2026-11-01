@@ -1,0 +1,1252 @@
+[
+{
+"paperId": "fb59b33a8ce6c12b59c8ac2952024556aff34119",
+"title": "4D-Fly: Fast 4D Reconstruction from a Single Monocular Video",
+"year": 2025,
+"externalIds": {
+"DBLP": "conf/cvpr/WuLHQZD25",
+"DOI": "10.1109/CVPR52734.2025.01553",
+"CorpusId": 280070186
+},
+"citationCount": 21,
+"publicationDate": null
+},
+{
+"paperId": "a8e2e3ff1770fd83228659e9e4d16114ddb9404b",
+"title": "Self Forcing: Bridging the Train-Test Gap in Autoregressive Video Diffusion",
+"year": 2025,
+"externalIds": {
+"ArXiv": "2506.08009",
+"DBLP": "journals/corr/abs-2506-08009",
+"DOI": "10.48550/arXiv.2506.08009",
+"CorpusId": 279251392
+},
+"citationCount": 732,
+"publicationDate": null
+},
+{
+"paperId": "f608f402cd477d9d6f52149e12c1daaf6cec172c",
+"title": "Video World Models with Long-term Spatial Memory",
+"year": 2025,
+"externalIds": {
+"DBLP": "conf/nips/WuYPXLLW25",
+"ArXiv": "2506.05284",
+"DOI": "10.48550/arXiv.2506.05284",
+"CorpusId": 279244178
+},
+"citationCount": 166,
+"publicationDate": null
+},
+{
+"paperId": "b56cf21ba14e48248a99d812eb4dfcf6a8f2aadd",
+"title": "Playing with Transformer at 30+ FPS via Next-Frame Diffusion",
+"year": 2025,
+"externalIds": {
+"ArXiv": "2506.01380",
+"DBLP": "journals/corr/abs-2506-01380",
+"DOI": "10.48550/arXiv.2506.01380",
+"CorpusId": 279075664
+},
+"citationCount": 19,
+"publicationDate": null
+},
+{
+"paperId": "eefe4704280b12e9087f36d524c604c105722de5",
+"title": "MLLMs Need 3D-Aware Representation Supervision for Scene Understanding",
+"year": 2025,
+"externalIds": {
+"ArXiv": "2506.01946",
+"DBLP": "conf/nips/HuangWXH25",
+"DOI": "10.48550/arXiv.2506.01946",
+"CorpusId": 279119197
+},
+"citationCount": 80,
+"publicationDate": null
+},
+{
+"paperId": "eb2705902ab73312e59396244cb7c2c0f908aebd",
+"title": "VideoREPA: Learning Physics for Video Generation through Relational Alignment with Foundation Models",
+"year": 2025,
+"externalIds": {
+"DBLP": "conf/nips/ZhangLZMWYC25",
+"ArXiv": "2505.23656",
+"DOI": "10.48550/arXiv.2505.23656",
+"CorpusId": 278996820
+},
+"citationCount": 117,
+"publicationDate": null
+},
+{
+"paperId": "37cc48c8e1ebadd56ee6295f7afec9cc8f11b29d",
+"title": "Spatial-MLLM: Boosting MLLM Capabilities in Visual-based Spatial Intelligence",
+"year": 2025,
+"externalIds": {
+"DBLP": "journals/corr/abs-2505-23747",
+"ArXiv": "2505.23747",
+"DOI": "10.48550/arXiv.2505.23747",
+"CorpusId": 278996112
+},
+"citationCount": 269,
+"publicationDate": null
+},
+{
+"paperId": "a66055e694725605f36b0eca9c7daa9631761876",
+"title": "VLM-3R: Vision-Language Models Augmented with Instruction-Aligned 3D Reconstruction",
+"year": 2025,
+"externalIds": {
+"ArXiv": "2505.20279",
+"DBLP": "journals/corr/abs-2505-20279",
+"DOI": "10.48550/arXiv.2505.20279",
+"CorpusId": 279449925
+},
+"citationCount": 200,
+"publicationDate": null
+},
+{
+"paperId": "51393dfbfd50a47030023c1ea1ef9f8e4a18941d",
+"title": "Long-Context State-Space Video World Models",
+"year": 2025,
+"externalIds": {
+"DBLP": "journals/corr/abs-2505-20171",
+"ArXiv": "2505.20171",
+"DOI": "10.1109/ICCV51701.2025.00817",
+"CorpusId": 278911218
+},
+"citationCount": 79,
+"publicationDate": null
+},
+{
+"paperId": "7590bfb8c4f5127acc8dc7616a942b1f24352e57",
+"title": "VGGT-SLAM: Dense RGB SLAM Optimized on the SL(4) Manifold",
+"year": 2025,
+"externalIds": {
+"DBLP": "journals/corr/abs-2505-12549",
+"ArXiv": "2505.12549",
+"DOI": "10.48550/arXiv.2505.12549",
+"CorpusId": 278739766
+},
+"citationCount": 191,
+"publicationDate": null
+},
+{
+"paperId": "d0aef077f96cc06279b7a8e0a09c37623f7b4939",
+"title": "A Survey of Interactive Generative Video",
+"year": 2025,
+"externalIds": {
+"DBLP": "journals/corr/abs-2504-21853",
+"ArXiv": "2504.21853",
+"DOI": "10.48550/arXiv.2504.21853",
+"CorpusId": 278208175
+},
+"citationCount": 27,
+"publicationDate": null
+},
+{
+"paperId": "bdb7f4493f9f4729c56bf28fb982c686d33681bb",
+"title": "TesserAct: Learning 4D Embodied World Models",
+"year": 2025,
+"externalIds": {
+"DBLP": "journals/corr/abs-2504-20995",
+"ArXiv": "2504.20995",
+"DOI": "10.48550/arXiv.2504.20995",
+"CorpusId": 278171781
+},
+"citationCount": 99,
+"publicationDate": null
+},
+{
+"paperId": "c53fc2296f42ed59ae479148e445563aee40a088",
+"title": "WORLDMEM: Long-term Consistent World Simulation with Memory",
+"year": 2025,
+"externalIds": {
+"ArXiv": "2504.12369",
+"DBLP": "conf/nips/XiaoLZOYZP25",
+"DOI": "10.48550/arXiv.2504.12369",
+"CorpusId": 277857150
+},
+"citationCount": 197,
+"publicationDate": null
+},
+{
+"paperId": "8257f34c0cb0c69ccf7df4d2a9423c42a8f4b052",
+"title": "MineWorld: a Real-Time and Open-Source Interactive World Model on Minecraft",
+"year": 2025,
+"externalIds": {
+"ArXiv": "2504.08388",
+"DBLP": "journals/corr/abs-2504-08388",
+"DOI": "10.48550/arXiv.2504.08388",
+"CorpusId": 277741388
+},
+"citationCount": 108,
+"publicationDate": null
+},
+{
+"paperId": "19ff77140093c2fb873f01969b55277590e9d315",
+"title": "Geo4D: Leveraging Video Generators for Geometric 4D Scene Reconstruction",
+"year": 2025,
+"externalIds": {
+"DBLP": "journals/corr/abs-2504-07961",
+"ArXiv": "2504.07961",
+"DOI": "10.1109/ICCV51701.2025.01921",
+"CorpusId": 277667585
+},
+"citationCount": 77,
+"publicationDate": null
+},
+{
+"paperId": "d6a5f0339ddf541482b39ab4e25d670191ef1903",
+"title": "WorldScore: A Unified Evaluation Benchmark for World Generation",
+"year": 2025,
+"externalIds": {
+"DBLP": "conf/iccv/DuanYCFW25",
+"ArXiv": "2504.00983",
+"DOI": "10.1109/ICCV51701.2025.02573",
+"CorpusId": 277468292
+},
+"citationCount": 168,
+"publicationDate": null
+},
+{
+"paperId": "a4dec28c96d3f87dc45e5b04cf6bd2e4c9453177",
+"title": "Can Video Diffusion Model Reconstruct 4D Geometry?",
+"year": 2025,
+"externalIds": {
+"DBLP": "journals/corr/abs-2503-21082",
+"ArXiv": "2503.21082",
+"DOI": "10.48550/arXiv.2503.21082",
+"CorpusId": 277349534
+},
+"citationCount": 12,
+"publicationDate": null
+},
+{
+"paperId": "8877e9a5bf473404c35b758faa76905c202f0f36",
+"title": "Wan: Open and Advanced Large-Scale Video Generative Models",
+"year": 2025,
+"externalIds": {
+"ArXiv": "2503.20314",
+"DBLP": "journals/corr/abs-2503-20314",
+"DOI": "10.48550/arXiv.2503.20314",
+"CorpusId": 277321639
+},
+"citationCount": 3071,
+"publicationDate": null
+},
+{
+"paperId": "249804a0941fc402d2bd130c02f094dddebead00",
+"title": "AETHER: Geometric-Aware Unified World Modeling",
+"year": 2025,
+"externalIds": {
+"DBLP": "journals/corr/abs-2503-18945",
+"ArXiv": "2503.18945",
+"DOI": "10.1109/ICCV51701.2025.00799",
+"CorpusId": 277313222
+},
+"citationCount": 119,
+"publicationDate": null
+},
+{
+"paperId": "e896928a9725ab61c9c0a91253c162978690bda5",
+"title": "Fast Autoregressive Video Generation with Diagonal Decoding",
+"year": 2025,
+"externalIds": {
+"ArXiv": "2503.14070",
+"DBLP": "journals/corr/abs-2503-14070",
+"DOI": "10.48550/arXiv.2503.14070",
+"CorpusId": 277104081
+},
+"citationCount": 8,
+"publicationDate": null
+},
+{
+"paperId": "2b6dca7caa80ff249b498cce0eabcfc2c36c76a1",
+"title": "FlexWorld: Progressively Expanding 3D Scenes for Flexiable-View Synthesis",
+"year": 2025,
+"externalIds": {
+"ArXiv": "2503.13265",
+"DBLP": "journals/corr/abs-2503-13265",
+"DOI": "10.48550/arXiv.2503.13265",
+"CorpusId": 277103628
+},
+"citationCount": 41,
+"publicationDate": null
+},
+{
+"paperId": "4356b46e5dd1a4ebd579b1cd6eb3eeedddd5a65c",
+"title": "VGGT: Visual Geometry Grounded Transformer",
+"year": 2025,
+"externalIds": {
+"ArXiv": "2503.11651",
+"DBLP": "conf/cvpr/WangCKV0N25",
+"DOI": "10.1109/CVPR52734.2025.00499",
+"CorpusId": 277043968
+},
+"citationCount": 2132,
+"publicationDate": null
+},
+{
+"paperId": "4b6a567736fbf0e38f088806af06fba4a59f79e2",
+"title": "AR-Diffusion: Asynchronous Video Generation with Auto-Regressive Diffusion",
+"year": 2025,
+"externalIds": {
+"ArXiv": "2503.07418",
+"DBLP": "journals/corr/abs-2503-07418",
+"DOI": "10.1109/CVPR52734.2025.00690",
+"CorpusId": 276928789
+},
+"citationCount": 60,
+"publicationDate": null
+},
+{
+"paperId": "443775ea7430bd3a1a9dbe05f8279228d058c925",
+"title": "FLARE: Feed-Forward Geometry, Appearance and Camera Estimation from Uncalibrated Sparse Views",
+"year": 2025,
+"externalIds": {
+"DBLP": "journals/corr/abs-2502-12138",
+"ArXiv": "2502.12138",
+"DOI": "10.1109/CVPR52734.2025.02043",
+"CorpusId": 276422283
+},
+"citationCount": 217,
+"publicationDate": null
+},
+{
+"paperId": "5926af6f48c5cfa83e79415562c327811b012194",
+"title": "MaskFlow: Discrete Flows For Flexible and Efficient Long Video Generation",
+"year": 2025,
+"externalIds": {
+"ArXiv": "2502.11234",
+"DBLP": "journals/corr/abs-2502-11234",
+"DOI": "10.48550/arXiv.2502.11234",
+"CorpusId": 276408129
+},
+"citationCount": 12,
+"publicationDate": null
+},
+{
+"paperId": "8cc8db4b3846b7d9f33140af1a7353e4a0cb2863",
+"title": "History-Guided Video Diffusion",
+"year": 2025,
+"externalIds": {
+"DBLP": "journals/corr/abs-2502-06764",
+"ArXiv": "2502.06764",
+"DOI": "10.48550/arXiv.2502.06764",
+"CorpusId": 276249479
+},
+"citationCount": 191,
+"publicationDate": null
+},
+{
+"paperId": "62d564bc589cf6c37139144d0d6984d4aff1cc4a",
+"title": "Fast3R: Towards 3D Reconstruction of 1000+ Images in One Forward Pass",
+"year": 2025,
+"externalIds": {
+"ArXiv": "2501.13928",
+"DBLP": "journals/corr/abs-2501-13928",
+"DOI": "10.1109/CVPR52734.2025.02042",
+"CorpusId": 275820456
+},
+"citationCount": 459,
+"publicationDate": null
+},
+{
+"paperId": "4d969386c65de5c892f6477314a62cda523772ad",
+"title": "Continuous 3D Perception Model with Persistent State",
+"year": 2025,
+"externalIds": {
+"DBLP": "journals/corr/abs-2501-12387",
+"ArXiv": "2501.12387",
+"DOI": "10.1109/CVPR52734.2025.00983",
+"CorpusId": 275789153
+},
+"citationCount": 666,
+"publicationDate": null
+},
+{
+"paperId": "b95baf93d1cfb406b50aa370ce5ba18788b5891d",
+"title": "Cosmos World Foundation Model Platform for Physical AI",
+"year": 2025,
+"externalIds": {
+"DBLP": "journals/corr/abs-2501-03575",
+"ArXiv": "2501.03575",
+"DOI": "10.48550/arXiv.2501.03575",
+"CorpusId": 275342594
+},
+"citationCount": 998,
+"publicationDate": null
+},
+{
+"paperId": "8a56e6ea95f99d56299638eb7850e65d6f7ba66f",
+"title": "VideoDPO: Omni-Preference Alignment for Video Diffusion Generation",
+"year": 2024,
+"externalIds": {
+"DBLP": "journals/corr/abs-2412-14167",
+"ArXiv": "2412.14167",
+"DOI": "10.1109/CVPR52734.2025.00750",
+"CorpusId": 274822628
+},
+"citationCount": 131,
+"publicationDate": null
+},
+{
+"paperId": "5bddae4fb19fa6135fed1bf1e6639e87f80eec89",
+"title": "SLAM3R: Real-Time Dense Scene Reconstruction from Monocular RGB Videos",
+"year": 2024,
+"externalIds": {
+"DBLP": "conf/cvpr/LiuDWY0FC25",
+"ArXiv": "2412.09401",
+"DOI": "10.1109/CVPR52734.2025.01552",
+"CorpusId": 274655772
+},
+"citationCount": 141,
+"publicationDate": null
+},
+{
+"paperId": "18a1a0f356f518ba35a2558a64e78800f430cc4c",
+"title": "Driv3R: Learning Dense 4D Reconstruction for Autonomous Driving",
+"year": 2024,
+"externalIds": {
+"DBLP": "journals/corr/abs-2412-06777",
+"ArXiv": "2412.06777",
+"DOI": "10.48550/arXiv.2412.06777",
+"CorpusId": 274610426
+},
+"citationCount": 30,
+"publicationDate": null
+},
+{
+"paperId": "2bd7364a87e65c980d2c04c433d2d460a9cf95f5",
+"title": "MegaSaM: Accurate, Fast, and Robust Structure and Motion from Casual Dynamic Videos",
+"year": 2024,
+"externalIds": {
+"DBLP": "journals/corr/abs-2412-04463",
+"ArXiv": "2412.04463",
+"DOI": "10.1109/CVPR52734.2025.00981",
+"CorpusId": 274515197
+},
+"citationCount": 276,
+"publicationDate": null
+},
+{
+"paperId": "c0900c4149df25531488fae3cd6a5aac0139d0d4",
+"title": "The Matrix: Infinite-Horizon World Generation with Real-Time Moving Control",
+"year": 2024,
+"externalIds": {
+"ArXiv": "2412.03568",
+"DBLP": "journals/corr/abs-2412-03568",
+"DOI": "10.48550/arXiv.2412.03568",
+"CorpusId": 274465305
+},
+"citationCount": 98,
+"publicationDate": null
+},
+{
+"paperId": "9ca72cef4487494cd835e7abca65794407db62ee",
+"title": "Navigation World Models",
+"year": 2024,
+"externalIds": {
+"DBLP": "conf/cvpr/BarZTDL25",
+"ArXiv": "2412.03572",
+"DOI": "10.1109/CVPR52734.2025.01472",
+"CorpusId": 274465127
+},
+"citationCount": 383,
+"publicationDate": null
+},
+{
+"paperId": "1fa298e3f745099d39ca5bd088fcb62f87e8cc2f",
+"title": "HunyuanVideo: A Systematic Framework For Large Video Generative Models",
+"year": 2024,
+"externalIds": {
+"ArXiv": "2412.03603",
+"DBLP": "journals/corr/abs-2412-03603",
+"DOI": "10.48550/arXiv.2412.03603",
+"CorpusId": 274514554
+},
+"citationCount": 1860,
+"publicationDate": null
+},
+{
+"paperId": "b1092759de1ba84e621d9bc65b6cd61a3c4a1633",
+"title": "World-consistent Video Diffusion with Explicit 3D Modeling",
+"year": 2024,
+"externalIds": {
+"DBLP": "conf/cvpr/ZhangZMMTSG25",
+"ArXiv": "2412.01821",
+"DOI": "10.1109/CVPR52734.2025.02020",
+"CorpusId": 274437436
+},
+"citationCount": 75,
+"publicationDate": null
+},
+{
+"paperId": "5666d551bc9f86e2f379ede8b8ffddbe4d1d53a8",
+"title": "Structured 3D Latents for Scalable and Versatile 3D Generation",
+"year": 2024,
+"externalIds": {
+"DBLP": "conf/cvpr/XiangLXDWZC0Y25",
+"ArXiv": "2412.01506",
+"DOI": "10.1109/CVPR52734.2025.02000",
+"CorpusId": 274436286
+},
+"citationCount": 1044,
+"publicationDate": null
+},
+{
+"paperId": "ed92a7be6b2acc36baf0ed43454a97dbade0c893",
+"title": "Movie Gen: A Cast of Media Foundation Models",
+"year": 2024,
+"externalIds": {
+"ArXiv": "2410.13720",
+"CorpusId": 273403698
+},
+"citationCount": 714,
+"publicationDate": null
+},
+{
+"paperId": "f5ac95fa58815a35622a60f42a5729f518e57cdf",
+"title": "Representation Alignment for Generation: Training Diffusion Transformers Is Easier Than You Think",
+"year": 2024,
+"externalIds": {
+"DBLP": "journals/corr/abs-2410-06940",
+"ArXiv": "2410.06940",
+"DOI": "10.48550/arXiv.2410.06940",
+"CorpusId": 273229262
+},
+"citationCount": 840,
+"publicationDate": null
+},
+{
+"paperId": "bde2a93e64558fae1b447e6beec0d3624dfc790a",
+"title": "ViewCrafter: Taming Video Diffusion Models for High-fidelity Novel View Synthesis",
+"year": 2024,
+"externalIds": {
+"DBLP": "journals/corr/abs-2409-02048",
+"ArXiv": "2409.02048",
+"DOI": "10.48550/arXiv.2409.02048",
+"CorpusId": 272366673,
+"PubMed": "40986578"
+},
+"citationCount": 465,
+"publicationDate": null
+},
+{
+"paperId": "c51f822d9fa458c298c6b3182e5c3a3d09ecd881",
+"title": "Compositional 3D-aware Video Generation with LLM Director",
+"year": 2024,
+"externalIds": {
+"DBLP": "journals/corr/abs-2409-00558",
+"ArXiv": "2409.00558",
+"DOI": "10.48550/arXiv.2409.00558",
+"CorpusId": 272366954
+},
+"citationCount": 21,
+"publicationDate": null
+},
+{
+"paperId": "75d7591078a74aa6bfcdaf5bde7dbe5146a45ecd",
+"title": "Diffusion Models Are Real-Time Game Engines",
+"year": 2024,
+"externalIds": {
+"DBLP": "journals/corr/abs-2408-14837",
+"ArXiv": "2408.14837",
+"DOI": "10.48550/arXiv.2408.14837",
+"CorpusId": 271962839
+},
+"citationCount": 369,
+"publicationDate": null
+},
+{
+"paperId": "44d8c25fecb5628382854ecfe92e3b1015749e7c",
+"title": "Splatt3R: Zero-shot Gaussian Splatting from Uncalibrated Image Pairs",
+"year": 2024,
+"externalIds": {
+"ArXiv": "2408.13912",
+"DBLP": "journals/corr/abs-2408-13912",
+"DOI": "10.48550/arXiv.2408.13912",
+"CorpusId": 271957263
+},
+"citationCount": 214,
+"publicationDate": null
+},
+{
+"paperId": "7b248d78573ccf0dca6aa2cec2743d3eccaa9d1a",
+"title": "CogVideoX: Text-to-Video Diffusion Models with An Expert Transformer",
+"year": 2024,
+"externalIds": {
+"ArXiv": "2408.06072",
+"DBLP": "journals/corr/abs-2408-06072",
+"DOI": "10.48550/arXiv.2408.06072",
+"CorpusId": 271855655
+},
+"citationCount": 2627,
+"publicationDate": null
+},
+{
+"paperId": "40d63dc2b465c9081e4efc5a19514da151e97fe7",
+"title": "Diffusion Forcing: Next-token Prediction Meets Full-Sequence Diffusion",
+"year": 2024,
+"externalIds": {
+"ArXiv": "2407.01392",
+"DBLP": "journals/corr/abs-2407-01392",
+"DOI": "10.48550/arXiv.2407.01392",
+"CorpusId": 270869622
+},
+"citationCount": 851,
+"publicationDate": null
+},
+{
+"paperId": "1806ae222b5d5941eb621f8e366e2ebdbf96afa7",
+"title": "WonderWorld: Interactive 3D Scene Generation from a Single Image",
+"year": 2024,
+"externalIds": {
+"DBLP": "conf/cvpr/YuDHF025",
+"ArXiv": "2406.09394",
+"DOI": "10.1109/CVPR52734.2025.00555",
+"CorpusId": 270440501
+},
+"citationCount": 250,
+"publicationDate": null
+},
+{
+"paperId": "6f0f41e1909c568b4f002f2e782bde91d5f6202a",
+"title": "VividDream: Generating 3D Scene with Ambient Dynamics",
+"year": 2024,
+"externalIds": {
+"DBLP": "journals/corr/abs-2405-20334",
+"ArXiv": "2405.20334",
+"DOI": "10.48550/arXiv.2405.20334",
+"CorpusId": 270123528
+},
+"citationCount": 30,
+"publicationDate": null
+},
+{
+"paperId": "5354281f118de985fe2bbd1a0b45862d363a5202",
+"title": "T2V-Turbo: Breaking the Quality Bottleneck of Video Consistency Model with Mixed Reward Feedback",
+"year": 2024,
+"externalIds": {
+"DBLP": "conf/nips/LiFFWBCW24",
+"ArXiv": "2405.18750",
+"DOI": "10.48550/arXiv.2405.18750",
+"CorpusId": 270094742
+},
+"citationCount": 104,
+"publicationDate": null
+},
+{
+"paperId": "02f4516502bc0d05fb8971687f37c5f319ca2704",
+"title": "Diffusion for World Modeling: Visual Details Matter in Atari",
+"year": 2024,
+"externalIds": {
+"DBLP": "journals/corr/abs-2405-12399",
+"ArXiv": "2405.12399",
+"DOI": "10.48550/arXiv.2405.12399",
+"CorpusId": 269930021
+},
+"citationCount": 407,
+"publicationDate": null
+},
+{
+"paperId": "3fc6184c72fd55b67409ef87493c333f15a33180",
+"title": "CameraCtrl: Enabling Camera Control for Text-to-Video Generation",
+"year": 2024,
+"externalIds": {
+"DBLP": "journals/corr/abs-2404-02101",
+"ArXiv": "2404.02101",
+"DOI": "10.48550/arXiv.2404.02101",
+"CorpusId": 268857272
+},
+"citationCount": 524,
+"publicationDate": null
+},
+{
+"paperId": "60bdb4c44136fc452170cc65fbd9cd8ad73ca425",
+"title": "UniDepth: Universal Monocular Metric Depth Estimation",
+"year": 2024,
+"externalIds": {
+"ArXiv": "2403.18913",
+"DBLP": "journals/corr/abs-2403-18913",
+"DOI": "10.1109/CVPR52733.2024.00963",
+"CorpusId": 268732706
+},
+"citationCount": 541,
+"publicationDate": null
+},
+{
+"paperId": "bef2647d7eef07049baf63caa7952eb127a10fe2",
+"title": "TC4D: Trajectory-Conditioned Text-to-4D Generation",
+"year": 2024,
+"externalIds": {
+"DBLP": "journals/corr/abs-2403-17920",
+"ArXiv": "2403.17920",
+"DOI": "10.48550/arXiv.2403.17920",
+"CorpusId": 268691972
+},
+"citationCount": 92,
+"publicationDate": null
+},
+{
+"paperId": "10d2480b4b5aab8051611baf3b6ca13b27d0d900",
+"title": "Comp4D: LLM-Guided Compositional 4D Scene Generation",
+"year": 2024,
+"externalIds": {
+"ArXiv": "2403.16993",
+"DBLP": "journals/corr/abs-2403-16993",
+"DOI": "10.48550/arXiv.2403.16993",
+"CorpusId": 268681023
+},
+"citationCount": 54,
+"publicationDate": null
+},
+{
+"paperId": "c064de2c71ebc5cf05493f49dc312b033c36b3b9",
+"title": "Genie: Generative Interactive Environments",
+"year": 2024,
+"externalIds": {
+"DBLP": "conf/icml/BruceDEPS0LMSAA24",
+"ArXiv": "2402.15391",
+"DOI": "10.48550/arXiv.2402.15391",
+"CorpusId": 267897982
+},
+"citationCount": 1005,
+"publicationDate": null
+},
+{
+"paperId": "492bc8339d8aac442c4ec13f8c1d59e980a3af2f",
+"title": "VideoCrafter2: Overcoming Data Limitations for High-Quality Video Diffusion Models",
+"year": 2024,
+"externalIds": {
+"DBLP": "conf/cvpr/ChenZCXWWS24",
+"ArXiv": "2401.09047",
+"DOI": "10.1109/CVPR52733.2024.00698",
+"CorpusId": 267028095
+},
+"citationCount": 741,
+"publicationDate": null
+},
+{
+"paperId": "0c4f46e4dcae5527018e6432fb60cfe8c3354e97",
+"title": "VideoPoet: A Large Language Model for Zero-Shot Video Generation",
+"year": 2023,
+"externalIds": {
+"ArXiv": "2312.14125",
+"DBLP": "conf/icml/KondratyukYGLHS24",
+"DOI": "10.48550/arXiv.2312.14125",
+"CorpusId": 266435847
+},
+"citationCount": 592,
+"publicationDate": null
+},
+{
+"paperId": "5f82a81766cb78395a55b8fc697c2421a20f4a9e",
+"title": "DUSt3R: Geometric 3D Vision Made Easy",
+"year": 2023,
+"externalIds": {
+"DBLP": "conf/cvpr/Wang0CCR24",
+"ArXiv": "2312.14132",
+"DOI": "10.1109/CVPR52733.2024.01956",
+"CorpusId": 266436038
+},
+"citationCount": 2114,
+"publicationDate": null
+},
+{
+"paperId": "07822949406197bec0090085e55dc7761295c7a8",
+"title": "WHAM: Reconstructing World-Grounded Humans with Accurate 3D Motion",
+"year": 2023,
+"externalIds": {
+"ArXiv": "2312.07531",
+"DBLP": "journals/corr/abs-2312-07531",
+"DOI": "10.1109/CVPR52733.2024.00202",
+"CorpusId": 266174382
+},
+"citationCount": 307,
+"publicationDate": null
+},
+{
+"paperId": "ff0baeb316df06d017f381c80a2c3aa6399fe938",
+"title": "4D-fy: Text-to-4D Generation Using Hybrid Score Distillation Sampling",
+"year": 2023,
+"externalIds": {
+"ArXiv": "2311.17984",
+"DBLP": "journals/corr/abs-2311-17984",
+"DOI": "10.1109/CVPR52733.2024.00764",
+"CorpusId": 265506421
+},
+"citationCount": 223,
+"publicationDate": null
+},
+{
+"paperId": "f673d3a0f98094190c5ed1fe8e18673803f1d38c",
+"title": "LucidDreamer: Domain-Free Generation of 3D Gaussian Splatting Scenes",
+"year": 2023,
+"externalIds": {
+"DBLP": "journals/tvcg/0002LNLL25",
+"ArXiv": "2311.13384",
+"DOI": "10.1109/TVCG.2025.3611489",
+"CorpusId": 265351721,
+"PubMed": "40966147"
+},
+"citationCount": 288,
+"publicationDate": null
+},
+{
+"paperId": "1891c3756f870d902a0b793a1dcd5cc34c778612",
+"title": "VideoCrafter1: Open Diffusion Models for High-Quality Video Generation",
+"year": 2023,
+"externalIds": {
+"DBLP": "journals/corr/abs-2310-19512",
+"ArXiv": "2310.19512",
+"DOI": "10.48550/arXiv.2310.19512",
+"CorpusId": 264803867
+},
+"citationCount": 654,
+"publicationDate": null
+},
+{
+"paperId": "98478ac589e5b40a20630ff54bb4eec4ab4c5f6b",
+"title": "GAIA-1: A Generative World Model for Autonomous Driving",
+"year": 2023,
+"externalIds": {
+"ArXiv": "2309.17080",
+"DBLP": "journals/corr/abs-2309-17080",
+"DOI": "10.48550/arXiv.2309.17080",
+"CorpusId": 263310665
+},
+"citationCount": 768,
+"publicationDate": null
+},
+{
+"paperId": "2cc1d857e86d5152ba7fe6a8355c2a0150cc280a",
+"title": "3D Gaussian Splatting for Real-Time Radiance Field Rendering",
+"year": 2023,
+"externalIds": {
+"DBLP": "journals/tog/KerblKLD23",
+"ArXiv": "2308.04079",
+"DOI": "10.1145/3592433",
+"CorpusId": 259267917
+},
+"citationCount": 11224,
+"publicationDate": null
+},
+{
+"paperId": "5a9cb1b3dc4655218b3deeaf4a2417a9a8cd0891",
+"title": "DINOv2: Learning Robust Visual Features without Supervision",
+"year": 2023,
+"externalIds": {
+"DBLP": "journals/corr/abs-2304-07193",
+"ArXiv": "2304.07193",
+"DOI": "10.48550/arXiv.2304.07193",
+"CorpusId": 258170077
+},
+"citationCount": 11794,
+"publicationDate": null
+},
+{
+"paperId": "9fac3d0728a8c833a593446e3e176e90d856df04",
+"title": "VideoMAE V2: Scaling Video Masked Autoencoders with Dual Masking",
+"year": 2023,
+"externalIds": {
+"DBLP": "journals/corr/abs-2303-16727",
+"ArXiv": "2303.16727",
+"DOI": "10.1109/CVPR52729.2023.01398",
+"CorpusId": 257805127
+},
+"citationCount": 908,
+"publicationDate": null
+},
+{
+"paperId": "c2917da5abbf0f0cfb4ce366b180359ff8a9deae",
+"title": "DreamBooth3D: Subject-Driven Text-to-3D Generation",
+"year": 2023,
+"externalIds": {
+"DBLP": "conf/iccv/RajKPNRMZARBLJ23",
+"ArXiv": "2303.13508",
+"DOI": "10.1109/ICCV51070.2023.00223",
+"CorpusId": 257687714
+},
+"citationCount": 294,
+"publicationDate": null
+},
+{
+"paperId": "efbe97d20c4ffe356e8826c01dc550bacc405add",
+"title": "Adding Conditional Control to Text-to-Image Diffusion Models",
+"year": 2023,
+"externalIds": {
+"DBLP": "journals/corr/abs-2302-05543",
+"ArXiv": "2302.05543",
+"DOI": "10.1109/ICCV51070.2023.00355",
+"CorpusId": 256827727
+},
+"citationCount": 8187,
+"publicationDate": null
+},
+{
+"paperId": "736973165f98105fec3729b7db414ae4d80fcbeb",
+"title": "Scalable Diffusion Models with Transformers",
+"year": 2022,
+"externalIds": {
+"ArXiv": "2212.09748",
+"DBLP": "journals/corr/abs-2212-09748",
+"DOI": "10.1109/ICCV51070.2023.00387",
+"CorpusId": 254854389
+},
+"citationCount": 7984,
+"publicationDate": null
+},
+{
+"paperId": "af68f10ab5078bfc519caae377c90ee6d9c504e9",
+"title": "Flow Matching for Generative Modeling",
+"year": 2022,
+"externalIds": {
+"ArXiv": "2210.02747",
+"DBLP": "journals/corr/abs-2210-02747",
+"CorpusId": 252734897
+},
+"citationCount": 7439,
+"publicationDate": null
+},
+{
+"paperId": "897f3bb5eacaa80359e81ff33378e1110e20ae95",
+"title": "All are Worth Words: A ViT Backbone for Diffusion Models",
+"year": 2022,
+"externalIds": {
+"DBLP": "conf/cvpr/BaoNXCL0023",
+"ArXiv": "2209.12152",
+"DOI": "10.1109/CVPR52729.2023.02171",
+"CorpusId": 253581703
+},
+"citationCount": 706,
+"publicationDate": null
+},
+{
+"paperId": "244054a4254a2147e43a3dad9c124b9b7eb4a04a",
+"title": "Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow",
+"year": 2022,
+"externalIds": {
+"DBLP": "conf/iclr/LiuG023",
+"ArXiv": "2209.03003",
+"DOI": "10.48550/arXiv.2209.03003",
+"CorpusId": 252111177
+},
+"citationCount": 4575,
+"publicationDate": null
+},
+{
+"paperId": "65fc1f1c567801fee3788974e753cdbf934f07e9",
+"title": "Video PreTraining (VPT): Learning to Act by Watching Unlabeled Online Videos",
+"year": 2022,
+"externalIds": {
+"DBLP": "conf/nips/BakerAZHTEHSC22",
+"ArXiv": "2206.11795",
+"DOI": "10.48550/arXiv.2206.11795",
+"CorpusId": 249953673
+},
+"citationCount": 484,
+"publicationDate": null
+},
+{
+"paperId": "f58acfeb022ba15282ec5fc047c98010311fa9da",
+"title": "High-Resolution Image Synthesis with Latent Diffusion Models",
+"year": 2021,
+"externalIds": {
+"ArXiv": "2112.10752",
+"DBLP": "journals/corr/abs-2112-10752",
+"DOI": "10.1109/CVPR52688.2022.01042",
+"CorpusId": 245335280
+},
+"citationCount": 28754,
+"publicationDate": null
+},
+{
+"paperId": "67515d1f7df144683b059e684da7974e40aeaca1",
+"title": "DROID-SLAM: Deep Visual SLAM for Monocular, Stereo, and RGB-D Cameras",
+"year": 2021,
+"externalIds": {
+"DBLP": "journals/corr/abs-2108-10869",
+"ArXiv": "2108.10869",
+"CorpusId": 237278112
+},
+"citationCount": 1303,
+"publicationDate": null
+},
+{
+"paperId": "8e33914d6051dd031a5e096962b9398fc1d16067",
+"title": "Vision Transformers for Dense Prediction",
+"year": 2021,
+"externalIds": {
+"DBLP": "journals/corr/abs-2103-13413",
+"ArXiv": "2103.13413",
+"DOI": "10.1109/ICCV48922.2021.01196",
+"CorpusId": 232352612
+},
+"citationCount": 3246,
+"publicationDate": null
+},
+{
+"paperId": "bb8656979f38d95062ba55640c1be65535f57c6a",
+"title": "GIRAFFE: Representing Scenes as Compositional Generative Neural Feature Fields",
+"year": 2020,
+"externalIds": {
+"MAG": "3109420014",
+"ArXiv": "2011.12100",
+"DBLP": "conf/cvpr/Niemeyer021",
+"DOI": "10.1109/CVPR46437.2021.01129",
+"CorpusId": 227151657
+},
+"citationCount": 1098,
+"publicationDate": null
+},
+{
+"paperId": "5c126ae3421f05768d8edd97ecd44b1364e2c99a",
+"title": "Denoising Diffusion Probabilistic Models",
+"year": 2020,
+"externalIds": {
+"ArXiv": "2006.11239",
+"MAG": "3100572490",
+"DBLP": "journals/corr/abs-2006-11239",
+"CorpusId": 219955663
+},
+"citationCount": 37322,
+"publicationDate": null
+},
+{
+"paperId": "90abbc2cf38462b954ae1b772fac9532e2ccd8b0",
+"title": "Language Models are Few-Shot Learners",
+"year": 2020,
+"externalIds": {
+"DBLP": "conf/nips/BrownMRSKDNSSAA20",
+"MAG": "3030163527",
+"ArXiv": "2005.14165",
+"CorpusId": 218971783
+},
+"citationCount": 65933,
+"publicationDate": null
+},
+{
+"paperId": "add2f205338d70e10ce5e686df4a690e2851bdfc",
+"title": "Momentum Contrast for Unsupervised Visual Representation Learning",
+"year": 2019,
+"externalIds": {
+"MAG": "2987283559",
+"ArXiv": "1911.05722",
+"DBLP": "conf/cvpr/He0WXG20",
+"DOI": "10.1109/cvpr42600.2020.00975",
+"CorpusId": 207930212
+},
+"citationCount": 16196,
+"publicationDate": null
+},
+{
+"paperId": "b59233aab8364186603967bc12d88af48cc0992d",
+"title": "Towards Accurate Generative Models of Video: A New Metric & Challenges",
+"year": 2018,
+"externalIds": {
+"ArXiv": "1812.01717",
+"MAG": "2902437806",
+"DBLP": "journals/corr/abs-1812-01717",
+"CorpusId": 54458806
+},
+"citationCount": 1542,
+"publicationDate": null
+},
+{
+"paperId": "ff332c21562c87cab5891d495b7d0956f2d9228b",
+"title": "World Models",
+"year": 2018,
+"externalIds": {
+"ArXiv": "1803.10122",
+"MAG": "2795843265",
+"DBLP": "journals/corr/abs-1803-10122",
+"DOI": "10.5281/zenodo.1207631",
+"CorpusId": 4807711
+},
+"citationCount": 2366,
+"publicationDate": null
+},
+{
+"paperId": "c468bbde6a22d961829e1970e6ad5795e05418d1",
+"title": "The Unreasonable Effectiveness of Deep Features as a Perceptual Metric",
+"year": 2018,
+"externalIds": {
+"ArXiv": "1801.03924",
+"MAG": "2962785568",
+"DBLP": "journals/corr/abs-1801-03924",
+"DOI": "10.1109/CVPR.2018.00068",
+"CorpusId": 4766599
+},
+"citationCount": 21201,
+"publicationDate": null
+},
+{
+"paperId": "231af7dc01a166cac3b5b01ca05778238f796e41",
+"title": "GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium",
+"year": 2017,
+"externalIds": {
+"MAG": "2963981733",
+"DBLP": "conf/nips/HeuselRUNH17",
+"CorpusId": 326772
+},
+"citationCount": 20456,
+"publicationDate": null
+},
+{
+"paperId": "204e3073870fae3d05bcbc2f6a8e263d9b72e776",
+"title": "Attention is All you Need",
+"year": 2017,
+"externalIds": {
+"MAG": "2626778328",
+"DBLP": "journals/corr/VaswaniSPUJGKP17",
+"ArXiv": "1706.03762",
+"CorpusId": 13756489
+},
+"citationCount": 200850,
+"publicationDate": null
+},
+{
+"paperId": "eae2e0fa72e898c289365c0af16daf57a7a6cf40",
+"title": "Image quality assessment: from error visibility to structural similarity",
+"year": 2004,
+"externalIds": {
+"DBLP": "journals/tip/WangBSS04",
+"MAG": "2133665775",
+"DOI": "10.1109/TIP.2003.819861",
+"CorpusId": 207761262,
+"PubMed": "15376593"
+},
+"citationCount": 61567,
+"publicationDate": null
+},
+{
+"paperId": "ce9a21b93ba29d4145a8ef6bf401e77f261848de",
+"title": "A Learning Algorithm for Continually Running Fully Recurrent Neural Networks",
+"year": 1989,
+"externalIds": {
+"DBLP": "journals/neco/WilliamsZ89",
+"MAG": "2016589492",
+"DOI": "10.1162/neco.1989.1.2.270",
+"CorpusId": 14711886
+},
+"citationCount": 5194,
+"publicationDate": null
+},
+{
+"paperId": "9d3af1c5fd5f7fb51467b4308952bc4da8285396",
+"title": "Paper",
+"year": 1977,
+"externalIds": {
+"MAG": "2206047865",
+"DOI": "10.1177/003591577707000909",
+"CorpusId": 28208293
+},
+"citationCount": 5681,
+"publicationDate": null
+},
+{
+"paperId": "9405cc0d6169988371b2755e573cc28650d14dfe",
+"title": "Language Models are Unsupervised Multitask Learners",
+"year": 2019,
+"externalIds": {
+"MAG": "2955855238",
+"CorpusId": 160025533
+},
+"citationCount": 31238,
+"publicationDate": null
+},
+{
+"paperId": null,
+"title": "Stereo magnification: Learning view synthesis using multiplane images",
+"year": 2018,
+"externalIds": null,
+"citationCount": null,
+"publicationDate": null
+},
+{
+"paperId": "2149a87316c366f70413e6aafd956e92740efe14",
+"title": "An introduction to ray tracing",
+"year": 1993,
+"externalIds": {
+"MAG": "2055265955",
+"DBLP": "journals/cg/Cychosz93",
+"DOI": "10.1016/0097-8493(93)90060-M",
+"CorpusId": 1671395
+},
+"citationCount": 998,
+"publicationDate": null
+},
+{
+"paperId": null,
+"title": "Institutionum calculi integralis , volume 4",
+"year": 1845,
+"externalIds": null,
+"citationCount": null,
+"publicationDate": null
+},
+{
+"paperId": "cc08e072ce806ecc84d8bb6e65f896134306d8d1",
+"title": "NeRF: Representing scenes as neural radiance \ufb01elds for view synthesis",
+"year": null,
+"externalIds": {
+"CorpusId": 286787543
+},
+"citationCount": 6332,
+"publicationDate": null
+},
+{
+"paperId": null,
+"title": "A large-scale video dataset with",
+"year": null,
+"externalIds": null,
+"citationCount": null,
+"publicationDate": null
+},
+{
+"paperId": null,
+"title": "A CKNOWLEDGMENT We would like to acknowledge Kiwhan Song and Boyuan Chen for their valuable advice and assistance in reproducing the Diffusion Forcing Transformer results",
+"year": null,
+"externalIds": null,
+"citationCount": null,
+"publicationDate": null
+},
+{
+"paperId": null,
+"title": "Genie 2: A large-scale foundation world model",
+"year": null,
+"externalIds": null,
+"citationCount": null,
+"publicationDate": null
+},
+{
+"paperId": null,
+"title": "Geometry Forcing",
+"year": null,
+"externalIds": null,
+"citationCount": null,
+"publicationDate": null
+},
+{
+"paperId": null,
+"title": "our method significantly improves visual quality and geometric consistency in video generation",
+"year": null,
+"externalIds": null,
+"citationCount": null,
+"publicationDate": null
+},
+{
+"paperId": null,
+"title": "Oa-sis: A universe in a transformer",
+"year": null,
+"externalIds": null,
+"citationCount": null,
+"publicationDate": null
+},
+{
+"paperId": null,
+"title": "\u03c0 3 : Scalable permutation-equivariant",
+"year": null,
+"externalIds": null,
+"citationCount": null,
+"publicationDate": null
+}
+]

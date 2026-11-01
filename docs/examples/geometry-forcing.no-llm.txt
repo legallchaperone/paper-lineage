@@ -1,0 +1,85 @@
+Lineage of Geometry Forcing: Marrying Video Diffusion and 3D Representation for Consistent World Modeling (2025)  
+https://arxiv.org/abs/2507.07982
+No single main path: no dominant line: technique: REPA (5.6) vs base: DFoT (4.7); showing lines as peers
+Problem context: An introduction to ray tracing (1993); World Models (2018)
+
+Line 1: technique: REPA
+  Neural Ordinary Differential Equations (2018)  [unexplored]
+  │ ↓ built on
+  │     “Exact likelihood computation Leveraging the connection to neural ODEs, we can compute the density defined by 
+Eq. 13 via the instantaneous change of variables...”
+  Score-Based Generative Modeling through Stoch... (2020)
+  │   + also: DDPM (built on)
+  │ ↓ built on
+  │     “We follow [ 64 ] and use the standard variance-preserving (VP) SDE in forward-time”
+  SiT (2024)
+  │   + also: DiT (built on)
+  │ ↓ built on
+  │     “Following Ma et al. (2024a), we mainly consider a simple linear interpolant with restricting T=1: 
+\alpha_{t}=1-t and \sigma_{t}=t.”
+  REPA (2024)
+  │   + also: DiT (built on), Denoising Diffusion Autoencoders are Unified... (built on), DDPM (built on)
+  │ ↓ idea
+  │     “In this work, inspired by recent advances in REPA ( Yu et al., 2024a ), we propose Geometry Forcing (GF) that 
+aligns the features of video diffusion models w...”
+  Geometry Forcing (2025)
+  (also in this line: DDPM (2020)  [foundation]; iGPT (2020)  [origin]; EDM (2022)  [foundation]; DiT (2022)  
+[foundation]; Denoising Diffusion Autoencoders are Unified... (2023))
+
+Line 2: base: DFoT
+  Diffusion Forcing (2024)  [origin]
+  │   ↳ alternative: Diffusion policy (2023)
+  │   ↳ alternative: AR-Diffusion (2023)
+  │ ↓ built on
+  │     “As illustrated in Figure 2, instead of setting noise levels to zero for all history frames, we adopt per-frame 
+independent noise levels introduced in Diffusi...”
+  DFoT (2025)
+  │   + also: DiT (uses), CogVideoX (built on), DDIM (uses)
+  │   ↳ alternative: Reduce, Reuse, Recycle (2023)
+  │   ↳ alternative: Compositional Visual Generation with Composab... (2022)
+  │ ↓ built on
+  │     “Our approach builds upon autoregressive video diffusion models ( Chen et al., 2024a ; Song et al., 2025 ; Cheng
+et al., 2025 ) and incorporates a 3D foundati...”
+  Geometry Forcing (2025)
+  (also in this line: DDIM (2020)  [foundation]; VQGAN (2020)  [foundation]; MaskGIT (2022)  [unexplored]; C-ViViT 
+(2022)  [unexplored]; MAGVIT (2022)  [unexplored]; Patch n' Pack (2023)  [origin]; Language Model Beats Diffusion -- 
+Tokenizer i... (2023); CogVLM (2023); CogVideoX (2024); Vicuna (?)  [origin])
+
+Line 3: base: VGGT
+  RAFT (2020)  [origin]
+  │ ↓ built on
+  │     “In order to facilitate matching tracks to images, we adopt correlation features C^{i}_{t}\in\mathbb{R}^{S} 
+similar to RAFT [ 58 ].”
+  CoTracker (2023)
+  │ ↓ built on
+  │     “Finally, for keypoint tracking, we follow track-any-point methods such as [ 57 , 25 ].”
+  VGGT (2025)
+  │   + also: DUSt3R (built on), VGGSfM (built on)
+  │   ↳ alternative: Fast3R (2025)
+  │ ↓ built on
+  │     “Our approach builds upon autoregressive video diffusion models ( Chen et al., 2024a ; Song et al., 2025 ; Cheng
+et al., 2025 ) and incorporates a 3D foundati...”
+  Geometry Forcing (2025)
+  (also in this line: The Weiszfeld Algorithm (2011)  [origin]; COLMAP (2016)  [origin]; SuperPoint (2017)  
+[unexplored]; A Fusion Approach for Multi-Frame Optical Flo... (2018)  [unexplored]; R2D2 (2019)  [unexplored]; D2-Net 
+(2019)  [origin]; Multi-View Optimization of Local Feature Geom... (2020)  [unexplored]; PixSfM (2021); PiPs (2022); 
+CroCo (2022)  [origin]; VGGSfM (2023); DUSt3R (2023))
+
+Foundations (generic, not traced further): DiT (2022); DDIM (2020); DDPM (2020); EDM (2022); VQGAN (2020)
+Descendants (papers that build on the target):
+  ▸ EgoForge (2026)
+      “Built upon a diffusion-transformer backbone, EgoForge enforces representational alignment [ 70 , 64 ] between 
+diffusion latents and 3D geometric features for...”
+  ▸ MemCam (2026)
+      “Some approaches attempt to improve this by incorporating 3D reconstruction, like GeometryForcing [ 18 ], but 
+still face issues such as error accumulation and...”
+  ▸ Do View-Consistent Representations Matter for... (2025)
+      “Inspired by this finding, recent works have extended such representation distillation to video generation [ 110 ,
+91 ] or have additionally supervised video ...”
+Concurrent work (same time window, shares the target's parents):
+  ~ Video World Models with Long-term Spatial Memory (2025)  also builds on DFoT, Diffusion Forcing, VGGT; published 35 
+days before the target
+  ~ Memory Forcing (2025)  also builds on DFoT, Diffusion Forcing, VGGT; published 85 days after the target
+  ~ Improving Motion in Image-to-Video Models via... (2025)  also builds on DFoT, Diffusion Forcing, REPA; published 30 
+days before the target
+read 19 papers, classified 479 citations (heuristic)
