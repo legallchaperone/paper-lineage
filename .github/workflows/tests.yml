@@ -1,0 +1,34 @@
+name: tests
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -e '.[dev]'
+      - run: pytest -q
+      - name: tests also pass with the stdlib HTML parser (what lineage.pyz uses)
+        run: LINEAGE_HTML_PARSER=html.parser pytest -q
+  build-pyz:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: scripts/build_pyz.sh
+      - run: python3 dist/lineage.pyz --help
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lineage.pyz
+          path: dist/lineage.pyz

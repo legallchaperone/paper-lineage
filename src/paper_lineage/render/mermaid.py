@@ -18,8 +18,24 @@ def _esc(s: str) -> str:
     return s.replace('"', "'").replace("[", "(").replace("]", ")").replace("<", "‹").replace(">", "›")
 
 
-def render_mermaid(g: LineageGraph, max_label: int = 40) -> str:
-    out = ["flowchart TB"]
+def visible_keys(g: LineageGraph, full: bool = False) -> set[str]:
+    """Compact view: the lines' main chains + alternatives/motivation/descendants attached to them."""
+    if full:
+        return set(g.nodes)
+    keep = {g.target} | {k for line in g.lines for k in line.best_path}
+    for e in g.edges:
+        if e.role == "alternative" and e.parent in keep:
+            keep.add(e.child)
+        if e.role == "problem_motivation" and e.child == g.target:
+            keep.add(e.parent)
+        if g.nodes.get(e.child) and g.nodes[e.child].kind == "descendant" and e.parent == g.target:
+            keep.add(e.child)
+    return keep
+
+
+def render_mermaid(g: LineageGraph, max_label: int = 40, full: bool = False) -> str:
+    keep = visible_keys(g, full)
+    out = ["flowchart LR"]
     spine_edges = set(zip(g.spine or [], (g.spine or [])[1:]))
     placed: set[str] = set()
 
@@ -30,20 +46,20 @@ def render_mermaid(g: LineageGraph, max_label: int = 40) -> str:
 
     for i, line in enumerate(g.lines, 1):
         out.append(f'  subgraph L{i}["{_esc(line.label)}"]')
-        for k in line.members:
-            if k not in placed:
+        for k in (line.members if full else line.best_path[:-1]):
+            if k not in placed and k in keep:
                 out.append("    " + node_line(k))
                 placed.add(k)
         out.append("  end")
     for k in g.nodes:
-        if k not in placed:
+        if k not in placed and k in keep:
             out.append("  " + node_line(k))
             placed.add(k)
 
     link_styles = []
     idx = 0
     for e in g.edges:
-        if e.parent not in g.nodes or e.child not in g.nodes:
+        if e.parent not in keep or e.child not in keep:
             continue
         a, b = _id(e.parent), _id(e.child)
         if e.role == "alternative":

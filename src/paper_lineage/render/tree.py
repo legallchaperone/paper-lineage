@@ -30,7 +30,7 @@ def _quote(s: str, width: int = 160) -> str:
     return s if len(s) <= width else s[: width - 3] + "..."
 
 
-def build_renderable(g: LineageGraph, show_evidence: bool = False):
+def build_renderable(g: LineageGraph, show_evidence: bool = False, full: bool = False):
     tgt = g.nodes[g.target]
     out: list = []
     head = Text()
@@ -86,9 +86,12 @@ def build_renderable(g: LineageGraph, show_evidence: bool = False):
                 out.append(Text(f"  │     “{_quote(e.evidence)}”", style="dim italic"))
         # other members of this line not on the chain
         extra = [k for k in line.members if k not in chain]
-        if extra:
+        if extra and full:
             out.append(Text("  (also in this line: " + "; ".join(_name(g.nodes[k]) + _badge(g.nodes[k])
                                                             for k in extra) + ")", style="dim"))
+        elif extra:
+            out.append(Text(f"  (+{len(extra)} more papers in this line: --full, or click through in -f html)",
+                            style="dim"))
         out.append(Text(""))
 
     alts = [e for e in g.children(g.target, lineage_only=False) if e.role == "alternative"]
@@ -133,7 +136,8 @@ def build_renderable(g: LineageGraph, show_evidence: bool = False):
     return Group(*out)
 
 
-def render_tree(g: LineageGraph, console: Console | None = None, show_evidence: bool = False) -> str:
+def render_tree(g: LineageGraph, console: Console | None = None, show_evidence: bool = False,
+                full: bool = False) -> str:
     console = console or Console(record=True, width=110)
-    console.print(build_renderable(g, show_evidence=show_evidence))
+    console.print(build_renderable(g, show_evidence=show_evidence, full=full))
     return console.export_text()

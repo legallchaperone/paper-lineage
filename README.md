@@ -90,12 +90,24 @@ lineage <arxiv url or id> [options]
   --evidence              print the evidence sentence under each edge in the tree view
   --no-llm                heuristics only
   --cache-dir DIR         default ~/.cache/paper-lineage (HTTP + LLM replies are cached)
+  --full                  tree/mermaid: draw every kept paper, not only the main chains
+  --render RUN.json       re-render a saved -f json run (no network, no LLM)
   -v, --verbose           log every keep/drop decision with its reason
 ```
 
-`-f html` writes a self-contained page: the Mermaid diagram plus a card per paper with every incoming
-edge and its evidence quote. `-f json` includes the full decision log (`decisions`), which is the
-first place to look when the tree surprises you.
+`-f html` writes a self-contained interactive page (no internet needed to view it): each line of
+work is a colored lane flowing left-to-right into your paper, with alternatives hanging below the paper
+they belong to. Drag to pan, scroll/pinch to zoom, click any paper to see the exact sentences that
+justify each link, its own parents and its alternatives — every kept paper is reachable from the side
+panel, even the ones not drawn. Toggles show side parents and links between lines.
+
+The terminal (`tree`) and `mermaid` views show only the main chains by default; add `--full` for
+everything. `-f json` keeps the full graph plus the decision log (`decisions`), which is the first
+place to look when a result surprises you. Re-render a saved run without fetching anything:
+
+```bash
+python3 lineage.pyz --render lineage-2609.24984.json -f html
+```
 
 ## How it works
 

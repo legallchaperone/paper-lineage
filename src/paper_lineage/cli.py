@@ -47,6 +47,9 @@ def main(
                                    "--cache-dir"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Log every keep/drop decision."),
     check_llm: bool = typer.Option(False, "--check-llm", help="Send one tiny request to the LLM gateway and exit."),
+    full: bool = typer.Option(False, "--full", help="tree/mermaid: draw every kept paper, not just the main chains."),
+    render: Optional[Path] = typer.Option(None, "--render",
+                                          help="Re-render a saved `-f json` run (no network) instead of running."),
 ):
     """Trace the citation-grounded lineage of an arXiv paper."""
     logging.basicConfig(level=logging.DEBUG if verbose else logging.WARNING,
@@ -66,8 +69,17 @@ def main(
             raise typer.Exit(1) from None
         err.print(f"[green]LLM OK[/green] at {cfg.base_url} with model {cfg.model}: {reply}")
         raise typer.Exit(0)
+    if render is not None:
+        import json as _json
+
+        from .graph import LineageGraph
+        graph = LineageGraph.from_dict(_json.loads(render.read_text(encoding="utf-8")))
+        if spine == "none":
+            graph.choose_spine("none")
+        _emit(graph, fmt, output or render.with_suffix(""), evidence, full)
+        return
     if not paper:
-        raise typer.BadParameter("give an arXiv url or id (or use --check-llm)")
+        raise typer.BadParameter("give an arXiv url or id (or use --check-llm / --render)")
     bad = [f for f in fmt if f not in FORMATS]
     if bad:
         raise typer.BadParameter(f"unknown format(s) {bad}; choose from {FORMATS}")
@@ -103,12 +115,18 @@ def main(
     if verbose:
         for d in graph.log:
             err.print(f"[dim]{d}[/dim]")
-    stem = output or Path(f"lineage-{arxiv_id.replace('/', '_')}")
+    _emit(graph, fmt, output or Path(f"lineage-{arxiv_id.replace('/', '_')}"), evidence, full)
+
+
+def _emit(graph, fmt: List[str], stem: Path, evidence: bool, full: bool) -> None:
     for f in fmt:
         if f == "tree":
-            Console().print(build_renderable(graph, show_evidence=evidence))
+            Console().print(build_renderable(graph, show_evidence=evidence, full=full))
             continue
-        text = {"mermaid": render_mermaid, "json": render_json, "html": render_html}[f](graph)
+        if f == "mermaid":
+            text = render_mermaid(graph, full=full)
+        else:
+            text = {"json": render_json, "html": render_html}[f](graph)
         path = stem if stem.suffix == "." + EXT[f] else Path(f"{stem}.{EXT[f]}")
         path.write_text(text, encoding="utf-8")
         err.print(f"wrote {path}")

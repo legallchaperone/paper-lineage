@@ -164,6 +164,27 @@ class LineageGraph:
         return n.meta.date or (f"{n.meta.year}-12-31" if n.meta.year else "9999")
 
     # ---------------------------------------------------------------- output
+    @classmethod
+    def from_dict(cls, d: dict[str, Any]) -> LineageGraph:
+        """Rebuild a graph from `to_dict()` output (e.g. a saved `-f json` run) for re-rendering."""
+        from .models import PaperMeta
+
+        meta_fields = {f for f in PaperMeta.__dataclass_fields__}
+        g = cls(target=d["target"])
+        for nd in d["nodes"]:
+            meta = PaperMeta(**{k: v for k, v in nd.items() if k in meta_fields and k != "key"}, key=nd["key"])
+            g.nodes[nd["key"]] = Node(meta=meta, kind=nd.get("kind", "ancestor"), depth=nd.get("depth", 0),
+                                      relevance=nd.get("relevance"), expanded=nd.get("expanded", False),
+                                      note=nd.get("note", ""))
+        edge_fields = {f for f in Edge.__dataclass_fields__}
+        for ed in d["edges"]:
+            g.edges.append(Edge(**{k: v for k, v in ed.items() if k in edge_fields}))
+        g.stats = d.get("stats", {})
+        g.log = d.get("decisions", [])
+        g.compute_lines()
+        g.choose_spine("none" if d.get("spine") is None and "disabled" in d.get("spine_reason", "") else "auto")
+        return g
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "schema_version": SCHEMA_VERSION,
