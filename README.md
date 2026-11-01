@@ -183,3 +183,9 @@ Tests run offline against saved fixtures (Geometry Forcing's HTML + S2 reference
 numeric-citation HTML, pdftotext output for both). `tests/test_llm_path.py` drives the full LLM path
 with a fake model that reads the real prompts, including a paraphrased quote (repaired) and an
 invented one (rejected). See `SPEC.md` for the original design spec.
+
+## License
+
+MIT, see [LICENSE](LICENSE). The HTML report embeds third-party components under their own
+licenses (rough.js and Temml: MIT; the Virgil font: SIL OFL 1.1); see
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
