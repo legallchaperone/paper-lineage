@@ -1,8 +1,34 @@
 # paper-lineage
 
-Give it an arXiv paper; it reads the paper, figures out which cited works it *actually descends from*,
-reads those recursively, and prints the lineage as a mind-map — from the origins of each line of work
-down to your paper.
+**Where does a paper really come from?** Give it an arXiv link. It reads the paper, works out which of
+the cited works it *actually descends from*, reads those too, and draws the whole family tree as an
+interactive, hand-drawn map, with the sentence from the paper that proves every arrow.
+
+<p align="center">
+  <img src="docs/images/worldcrafter.webp" alt="Lineage of WorldCrafter: three lines of work (Helios base, LagerNVS and UCPE ingredients) flowing into the paper, next to a walkthrough with quoted evidence" width="100%">
+</p>
+<p align="center"><sub>Real output for <i>WorldCrafter</i> (2026): three lines of work merge into one paper.
+Try it yourself: open <a href="docs/examples/worldcrafter.llm.html"><code>docs/examples/worldcrafter.llm.html</code></a> in a browser.</sub></p>
+
+## Why you might want it
+
+- **Skip the reading list.** Instead of 60 references, you get the 3 to 5 lines of work the paper truly stands on.
+- **Lines, not a single chain.** Real papers merge a base model, a technique and key ingredients. You see them as peers, flowing left to right into the paper.
+- **Every arrow has a receipt.** Each edge carries the verbatim sentence from the newer paper. The LLM only classifies citations it is shown, never invents papers, and any quote it cannot find in the source text is dropped.
+- **"Done differently" branches.** Dashed boxes show the alternatives a paper contrasts itself with.
+- **A page you can actually read.** Canvas on the left, walkthrough on the right: scroll the text and the canvas glides to the paper being discussed. One self-contained HTML file, no internet needed to view it.
+- **Zero install.** One `lineage.pyz` file and the `python3` you already have. Works with any OpenAI-compatible endpoint, and falls back to heuristics with no LLM.
+
+## Quick start
+
+```bash
+python3 lineage.pyz https://arxiv.org/abs/2507.07982 -f html     # writes lineage-2507.07982.html
+python3 lineage.pyz https://arxiv.org/abs/2507.07982 --evidence  # or print it in the terminal
+```
+
+(See [Install](#install) and [Configure the LLM](#configure-the-llm-any-openai-compatible-endpoint-eg-a-local-gateway) below.)
+
+## Or in your terminal
 
 ```
 $ lineage https://arxiv.org/abs/2507.07982 --evidence
