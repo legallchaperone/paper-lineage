@@ -130,6 +130,24 @@ lineage --check-llm                         # one tiny request to verify the set
 Optional: `S2_API_KEY` (Semantic Scholar key — raises rate limits, makes runs much faster).
 Without an LLM configured the tool falls back to `--no-llm` heuristics.
 
+### Or use your ChatGPT subscription (no API key)
+
+With a ChatGPT plan (Plus, Pro, Team, …) the tool can run its LLM calls through OpenAI's official
+[Codex CLI](https://github.com/openai/codex), signed in with your ChatGPT account:
+
+```bash
+npm i -g @openai/codex
+codex login                                 # choose "Sign in with ChatGPT"
+lineage --llm codex --check-llm
+lineage --llm codex <arxiv url or id> -f html
+```
+
+Or set `LINEAGE_LLM_PROVIDER=codex` instead of passing `--llm codex`. Options: `LINEAGE_LLM_MODEL`
+(defaults to Codex's own default model), `LINEAGE_CODEX_EFFORT=low` (faster runs),
+`LINEAGE_CODEX_BIN` (path to `codex`). Each request runs `codex exec` in an empty temporary folder
+with a read-only sandbox. Each call starts a fresh Codex session, so this is slower than an API
+endpoint, and the calls count against your plan's usage limits. Replies are cached like API replies.
+
 ## Usage
 
 ```bash

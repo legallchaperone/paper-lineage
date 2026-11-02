@@ -8,6 +8,7 @@ If the user wants the origins / lineage / prior-work map of an arXiv paper, foll
 ```bash
 pipx install paper-lineage          # once
 lineage --check-llm                 # needs LINEAGE_LLM_BASE_URL / _MODEL / _API_KEY
+                                    # or, with a ChatGPT subscription: codex login; add --llm codex
 lineage <arxiv url or id> -f html -f json
 ```
 

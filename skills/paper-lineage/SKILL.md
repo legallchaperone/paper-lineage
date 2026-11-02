@@ -29,6 +29,10 @@ export LINEAGE_LLM_API_KEY=...    # if the endpoint needs one
 lineage --check-llm               # one tiny request; run this first
 ```
 
+If the user has a ChatGPT subscription instead of an API endpoint, use the Codex CLI
+(`npm i -g @openai/codex`, then the user runs `codex login` and picks "Sign in with ChatGPT"), then
+`lineage --llm codex --check-llm` and add `--llm codex` to every run (or `export LINEAGE_LLM_PROVIDER=codex`).
+
 Never invent or guess these values; ask the user if they are not set. If the user has no LLM, use
 `--no-llm` (heuristics only: fine for direct parents, weaker for deeper ancestors; tell the user).
 `S2_API_KEY` (Semantic Scholar) is optional and makes runs much faster.
