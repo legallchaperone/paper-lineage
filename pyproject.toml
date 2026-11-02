@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "paper-lineage"
-version = "0.1.0"
+version = "0.1.1"
 description = "Trace the citation-grounded lineage of an arXiv paper and render it as a mind-map."
 readme = "README.md"
 license = {text = "MIT"}
