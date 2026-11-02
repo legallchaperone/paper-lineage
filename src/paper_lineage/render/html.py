@@ -19,7 +19,7 @@ from typing import Any
 
 from ..graph import LineageGraph
 from ..models import LINEAGE_ROLES
-from ..quality import _TITLE_SEPARATORS, abbreviation
+from ..quality import _TITLE_SEPARATORS, abbreviation, acronym
 from .mathtext import plain, rich
 
 ROLE_SHORT = {"builds_on": "built on", "technique_source": "idea from", "component": "uses",
@@ -60,7 +60,8 @@ def graph_payload(g: LineageGraph) -> dict:
     names = display_names(g)
     for k, n in g.nodes.items():
         m = n.meta
-        nodes[k] = {"name": plain(names[k]), "title": plain(m.title), "year": m.year, "url": m.url, "kind": n.kind,
+        nodes[k] = {"name": plain(names[k]), "title": plain(m.title), "intro": plain(m.intro or m.intro_quote or ""),
+                    "acr": plain(acronym(m.title)), "year": m.year, "url": m.url, "kind": n.kind,
                     "cites": m.citation_count,
                     "rel": None if n.relevance is None else round(n.relevance, 3), "note": n.note}
     edges = [{"p": e.parent, "c": e.child, "role": e.role, "d": e.directness, "inh": e.inherited,
@@ -180,6 +181,18 @@ class _Story:
         return (f'<details class="ev"><summary>{label}</summary><blockquote>“{rich(e.evidence)}”'
                 f'<cite>— {rich(src)}</cite></blockquote>{extra}</details>')
 
+    def blurb(self, k: str) -> str:
+        """What the paper is, in one sentence from its abstract: the LLM summary (with the abstract sentence
+        it was checked against folded underneath) or, without one, the abstract sentence itself."""
+        m = self.g.nodes[k].meta
+        if m.intro:
+            src = (f'<details class="ev"><summary>abstract</summary><blockquote>“{rich(m.intro_quote)}”'
+                   f'<cite>— {rich(self.name(k))}, abstract</cite></blockquote></details>') if m.intro_quote else ""
+            return f'<div class="blurb">{rich(m.intro)}</div>{src}'
+        if m.intro_quote:
+            return f'<div class="blurb quoted">“{rich(m.intro_quote)}” <span class="src">— abstract</span></div>'
+        return ""
+
     def summary(self, e) -> str:
         return rich(e.inherited) if e is not None and e.inherited else ""
 
@@ -230,6 +243,7 @@ class _Story:
             peers = ""
         body = f"""
 {lede}
+{self.blurb(g.target)}
 {recipe_html}
 <p class="lead-in">That comes from {n} line{'s' if n != 1 else ''} of work, each drawn as a frame on the canvas. {peers}</p>
 <nav class="routes" aria-label="Lines of work">{routes}</nav>
@@ -284,7 +298,7 @@ sentence from the papers themselves: open its <span class="evword">quote</span>,
             items.append(
                 f'<li class="step tl" data-focus="node:{_e(k)}:{i}" data-node="{_e(k)}" data-lane="{i}">'
                 f'<div class="tl-head"><span class="when">{self.year(k)}</span> <b>{rich(label)}</b>'
-                f'{self.ext(k)}</div><div class="tl-body{" muted" if j == 0 else ""}">{"".join(body)}</div>'
+                f'{self.ext(k)}</div>{self.blurb(k)}<div class="tl-body{" muted" if j == 0 else ""}">{"".join(body)}</div>'
                 f'{direct}{ev}</li>')
         alts = []
         for k in chain:
@@ -292,7 +306,8 @@ sentence from the papers themselves: open its <span class="evword">quote</span>,
                 alts.append(
                     f'<li class="alt" data-focus="node:{_e(e.child)}:{i}" data-node="{_e(e.child)}" data-lane="{i}">'
                     f'<b>{self.link(e.child)}</b> <span class="yr">· {self.year(e.child)}</span> '
-                    f'<span class="muted">— {rich(self.name(k))} contrasts itself with it</span>{self.quote(e)}</li>')
+                    f'<span class="muted">— {rich(self.name(k))} contrasts itself with it</span>{self.blurb(e.child)}'
+                    f'{self.quote(e)}</li>')
         alts_html = (f'<div class="alts"><h4>Done differently along the way</h4><ul>{"".join(alts)}</ul></div>'
                      if alts else "")
         lead = (f'<p class="tl-lead">How {self.mention(head, i)} came about, oldest first:</p>'
@@ -307,7 +322,8 @@ sentence from the papers themselves: open its <span class="evword">quote</span>,
             return
         items = "".join(
             f'<li class="alt" data-focus="node:{_e(e.child)}:t" data-node="{_e(e.child)}" data-lane="t">'
-            f'<b>{self.link(e.child)}</b> <span class="yr">· {self.year(e.child)}</span>{self.quote(e)}</li>'
+            f'<b>{self.link(e.child)}</b> <span class="yr">· {self.year(e.child)}</span>{self.blurb(e.child)}'
+            f'{self.quote(e)}</li>'
             for e in alts)
         body = (f"<p>Approaches to the same problem that {self.tname()} positions itself against.</p>"
                 f'<div class="alts"><ul>{items}</ul></div>')
@@ -322,7 +338,7 @@ sentence from the papers themselves: open its <span class="evword">quote</span>,
                 e = self.edge(g.target, k)
                 sm = self.summary(e)
                 items.append(f'<li class="alt" data-focus="node:{_e(k)}:d" data-node="{_e(k)}" data-lane="d">'
-                             f'<b>{self.link(k)}</b> <span class="yr">· {self.year(k)}</span>'
+                             f'<b>{self.link(k)}</b> <span class="yr">· {self.year(k)}</span>{self.blurb(k)}'
                              f'<div>{SHORT_VERB.get(e.role, "built on") if e else "built on"} {self.tname()}'
                              f'{": " + sm if sm else ""}.</div>{self.quote(e)}</li>')
             self.sections.append(("descendants", "What came after",
@@ -331,7 +347,7 @@ sentence from the papers themselves: open its <span class="evword">quote</span>,
         conc = [k for k, n in g.nodes.items() if n.kind == "concurrent"]
         if conc:
             items = "".join(f"<li><b>{self.link(k)}</b> <span class='yr'>· {self.year(k)}</span>"
-                            f"<div class='muted'>{rich(g.nodes[k].note)}</div></li>" for k in conc)
+                            f"{self.blurb(k)}<div class='muted'>{rich(g.nodes[k].note)}</div></li>" for k in conc)
             self.sections.append(("concurrent", "Around the same time",
                                   "<p>Not cited by the target: published in the same window and built on the same "
                                   f'parents.</p><div class="alts"><ul>{items}</ul></div>', ""))
@@ -479,6 +495,9 @@ section.line h2::before{content:"";display:inline-block;width:16px;height:16px;b
 .tl-head{font-size:19px;line-height:1.45}
 .when{display:inline-block;min-width:44px;color:var(--muted);font-size:15px;font-variant-numeric:tabular-nums}
 .tl-body{font-size:17.5px;line-height:1.6;margin-top:2px}
+.blurb{font-size:15.5px;line-height:1.5;color:#4a4a4a;margin:3px 0 4px}
+.blurb.quoted{font-style:italic}.blurb .src{font-style:normal;color:var(--muted);font-size:13.5px}
+.blurb+details.ev{margin-top:0}
 .tl-body.muted{font-size:16px;font-style:italic}
 .direct{font-size:15.5px;color:var(--red);margin-top:4px}
 .ext{color:var(--muted)!important;text-decoration:none;font-size:.8em;margin-left:2px}
@@ -553,6 +572,23 @@ function wrap(str, size, maxW, maxLines) {
   if (cur) out.push(cur);
   if (out.length > maxLines) { out.length = maxLines; out[maxLines - 1] += '…'; }
   return out.map(l => { while (mctx.measureText(l).width > maxW && l.length > 2) l = l.slice(0, -2) + '…'; return l; });
+}
+// Box labels are never cut: shrink the font until the name fits, else use the title's acronym
+// (the full title is always in the hover text).
+function fit(str, size, maxW, maxLines) {
+  for (let s = size; s >= Math.round(size * 0.7); s--) {
+    mctx.font = `${s}px Virgil`;
+    const words = String(str).split(/\s+/); const out = []; let cur = '';
+    for (const w of words) { const t = cur ? cur + ' ' + w : w;
+      if (mctx.measureText(t).width <= maxW || !cur) cur = t; else { out.push(cur); cur = w; } }
+    if (cur) out.push(cur);
+    if (out.length <= maxLines && out.every(l => mctx.measureText(l).width <= maxW)) return {lines: out, size: s};
+  }
+  return null;
+}
+function boxLabel(n, size, maxW, maxLines) {
+  return fit(n.name, size, maxW, maxLines) || (n.acr && fit(n.acr, size, maxW, maxLines))
+    || {lines: wrap(n.name, size, maxW, maxLines), size};
 }
 function text(parent, x, y, str, size, color, anchor) {
   const t = el('text', {x, y, 'font-family': 'Virgil', 'font-size': size, fill: color || INK,
@@ -684,15 +720,14 @@ function paper(parent, k, lane, x, y, w, h, fill, kind) {
     stroke: INK, strokeWidth: kind === 'target' ? 2.6 : 1.8, roughness: 1, seed: hash(k + lane)};
   if (kind === 'alt') { opts.strokeLineDash = [8, 6]; opts.stroke = VIOLET; }
   g.appendChild(rc.path(rrect(x, y, w, h, 12), opts));
-  const size = kind === 'target' ? 27 : kind === 'alt' ? 18 : 21;
-  const lines = wrap(n.name, size, w - 28, kind === 'alt' ? 1 : 2);
+  const {lines, size} = boxLabel(n, kind === 'target' ? 27 : kind === 'alt' ? 18 : 21, w - 28, kind === 'alt' ? 1 : 2);
   const top = kind === 'alt' ? y + 25 : y + (lines.length > 1 ? 32 : 40) + (kind === 'target' ? 8 : 0);
   lines.forEach((s, i) => text(g, x + 14, top + i * (size + 4), s, size, INK));
   const tag = (n.year || '?') + (KTAG[n.kind] ? ' · ' + KTAG[n.kind] : '');
   text(g, x + 14, y + h - 12, tag, kind === 'alt' ? 14 : 15, GREY);
   el('rect', {x: x - 5, y: y - 5, width: w + 10, height: h + 10, rx: 14, fill: 'none', stroke: '#1d3a8a',
     'stroke-width': 1.4, 'stroke-dasharray': '3 4', class: 'hover'}, g);
-  el('title', {}, g).textContent = n.title;
+  el('title', {}, g).textContent = n.intro ? `${n.title}\n\n${n.intro}` : n.title;
   boxes[k + ':' + lane] = {x, y, w, h};
   if (!boxes[k]) boxes[k] = {x, y, w, h};
   g.addEventListener('click', ev => { if (moved) return; ev.stopPropagation(); fromCanvas(k, String(lane)); });

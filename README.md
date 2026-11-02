@@ -68,6 +68,10 @@ output is not one path but a graph:
   dominates the others (`--spine auto`, the default). Otherwise nothing is singled out.
 - **"Done differently" branches.** Each paper can carry up to two alternatives: approaches it
   contrasts itself with.
+- **What each paper is.** Every paper gets a one-sentence introduction from its own abstract, shown
+  under it in the walkthrough and when you hover its box on the canvas.
+- **Names.** The walkthrough gives a paper's full title the first time it comes up, with its short name
+  in parentheses (`… (REPA)`), and only the short name after that. The canvas uses the short names.
 
 ## Nothing is made up
 
@@ -78,6 +82,11 @@ Every claim is traceable to the text of the papers:
 - **The LLM only judges, never invents.** It labels citations it is shown. It cannot add papers.
 - **Quotes are checked.** If a quote returned by the LLM cannot be found in the paper's text, that
   link is dropped.
+- **Introductions come from the abstract.** Without an LLM, the introduction is the abstract sentence
+  where the paper says what it does ("We propose …"), copied word for word. With an LLM, it is a
+  one-sentence summary written from the abstract only. The summary is kept only if every number in it
+  and nearly all of its words appear in the abstract; otherwise the abstract sentence is shown. A
+  paper without an abstract gets no introduction.
 
 ## Install
 
@@ -193,6 +202,8 @@ lineage --render lineage-2609.24984.json -f html
 8. **Extras** — `--descendants`: citing papers whose own text shows they build on the target
    (fetched, parsed and classified the same way). `--concurrent`: bibliographic coupling — papers
    within ±90 days that cite ≥2 of the target's direct parents.
+9. **Introduce** — missing abstracts are fetched (Semantic Scholar, then arXiv); each paper gets its
+   self-describing abstract sentence and, with an LLM, a checked one-sentence summary (batches of 15).
 
 ## Output quality guarantees
 
@@ -202,6 +213,7 @@ Every graph, freshly computed or loaded with `--render`, goes through one normal
 - "what was inherited" summaries are clean phrases that complete *X builds on Y: …* (the LLM is given
   that exact format; the normalizer enforces it for any model and for older runs);
 - display names are never cut mid-word and are unique;
+- every paper with an abstract has an introduction sentence copied verbatim from it;
 - every lineage link has its evidence sentence, attributed to the paper that wrote it;
 - formulas are typeset (MathML) in the page and shown as Unicode in the terminal, never as raw LaTeX;
 - output is byte-for-byte deterministic.

@@ -7,7 +7,8 @@ patching special cases:
 * summaries ("what was inherited") are clean noun phrases that complete "X builds on Y: …"
   (no trailing period, lower-case first letter unless it is a name/acronym, bounded length);
 * every paper has a short display name that is never chopped mid-word, and names are unique;
-* lineage edges carry their evidence sentence.
+* lineage edges carry their evidence sentence;
+* every paper with an abstract has an introduction sentence copied verbatim from it.
 
 `check()` lists violations of the invariants, so tests and `--verbose` can catch regressions on any run.
 """
@@ -138,6 +139,9 @@ def normalize(g: LineageGraph) -> LineageGraph:
             base = m.short_name
             m.alias = f"{base} ’{str(m.year)[-2:]}" if m.year else f"{base} (2)"
         seen[m.short_name.lower()] = k
+    from .intros import ensure_quotes
+
+    ensure_quotes(g)
     return g
 
 
@@ -156,6 +160,9 @@ def check(g: LineageGraph) -> list[str]:
         if nm.lower() in names and names[nm.lower()] != k:
             issues.append(f"duplicate name: {nm!r}")
         names[nm.lower()] = k
+        m = n.meta
+        if m.intro_quote and m.intro_quote not in " ".join((m.abstract or "").split()):
+            issues.append(f"intro not verbatim from the abstract: {nm!r}")
     for e in g.edges:
         if e.inherited != clean_summary(e.inherited):
             issues.append(f"summary not normalized: {e.inherited!r}")

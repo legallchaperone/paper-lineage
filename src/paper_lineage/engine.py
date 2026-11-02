@@ -185,6 +185,9 @@ class Engine:
         if cfg.concurrent:
             from .extras import add_concurrent
             add_concurrent(self, g, target)
+        from .intros import add_intros
+        self.progress("writing paper introductions")
+        add_intros(g, llm=getattr(self.clf, "llm", None), s2=self.s2, arxiv=getattr(self.src, "arxiv", None))
         return g
 
     def _select(self, g: LineageGraph, node: Node, target: PaperMeta, cands: list[Candidate],

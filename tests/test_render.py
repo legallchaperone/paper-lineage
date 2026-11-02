@@ -161,3 +161,18 @@ def test_output_is_deterministic_across_processes(tmp_path):
                        check=True, env=env, capture_output=True)
         digests.add(hashlib.md5((out.with_suffix(".html").read_bytes() + out.with_suffix(".json").read_bytes())).hexdigest())
     assert len(digests) == 1
+
+
+def test_html_shows_a_one_sentence_intro_from_the_abstract():
+    import json as _json
+    g = small_graph()
+    g.nodes["arXiv:1"].meta.abstract = "Diffusion is slow to train. We introduce REPA, which aligns features."
+    g.nodes["arXiv:2"].meta.abstract = "We propose Geometry Forcing for consistent world models."
+    g.nodes["arXiv:2"].meta.intro = "Geometry Forcing makes world models consistent."
+    from paper_lineage.quality import normalize
+    h = render_html(normalize(g))           # engine runs and --render both normalize before rendering
+    assert '<div class="blurb quoted">“We introduce REPA, which aligns features.”' in h      # verbatim, no LLM
+    assert '<div class="blurb">Geometry Forcing makes world models consistent.</div>' in h   # LLM summary...
+    assert "“We propose Geometry Forcing for consistent world models.”" in h                 # ...and its source
+    data = _json.loads(h.split('<script type="application/json" id="data">')[1].split("</script>")[0])
+    assert data["nodes"]["arXiv:1"]["intro"] == "We introduce REPA, which aligns features."   # canvas hover
