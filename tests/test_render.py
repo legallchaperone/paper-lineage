@@ -70,9 +70,32 @@ def test_alternative_quotes_are_attributed_to_the_contrasting_paper():
     import re
     h = render_html(wc_graph())
     # Self-Forcing is an alternative that Helios contrasts itself with: the sentence is Helios's
-    li = re.search(r'<li class="alt"[^>]*>(?:(?!</li>).)*Self-Forcing(?:(?!</li>).)*</li>', h, re.S).group(0)
-    assert "— Helios" in li and "— Self-Forcing" not in li
+    li = re.search(r'<li class="alt"[^>]*>(?:(?!</li>).)*Self Forcing: Bridging(?:(?!</li>).)*</li>', h,
+                   re.S).group(0)
+    assert "— Helios" in li and "— Self-Forcing" not in li and "— Self Forcing" not in li
     assert "building on top of the VGGT model" in h             # evidence quoted
+
+
+def test_walkthrough_introduces_full_titles_then_short_names():
+    import re
+    g = wc_graph()
+    h = render_html(g)
+    article = h.split("<article>")[1].split("</article>")[0]
+    text = re.sub(r"<[^>]+>", "", article)
+    # first mention: full title with the short name in parentheses; afterwards the short name alone
+    full = "Cameras as Relative Positional Encoding (PRoPE"
+    assert text.count(full) == 1 and text.index(full) < text.index("2025 PRoPE")
+    # a name that already leads its title is not repeated: 'VGGT: Visual Geometry Grounded Transformer'
+    assert "VGGT: Visual Geometry Grounded Transformer" in text and "Transformer (VGGT)" not in text
+    # titles without a method name are never shown ellipsis-cut in the walkthrough
+    assert "Efficient Geometry-aware 3D Generative Adversarial Networks (EGA3DG)" in text
+    assert "…" not in re.sub(r"<[^>]+>", "", re.sub(r"<details.*?</details>", "", article, flags=re.S))
+
+
+def test_acronym_for_titles_without_a_name():
+    from paper_lineage.quality import acronym
+    assert acronym("Possible Principles Underlying the Transformations of Sensory Messages") == "PPUTSM"
+    assert acronym("Proving and Improving the Platonic Representation Hypothesis") == "PIPRH"
 
 
 def test_formulas_are_typeset_not_raw_but_evidence_stays_verbatim():
@@ -138,3 +161,18 @@ def test_output_is_deterministic_across_processes(tmp_path):
                        check=True, env=env, capture_output=True)
         digests.add(hashlib.md5((out.with_suffix(".html").read_bytes() + out.with_suffix(".json").read_bytes())).hexdigest())
     assert len(digests) == 1
+
+
+def test_html_shows_a_one_sentence_intro_from_the_abstract():
+    import json as _json
+    g = small_graph()
+    g.nodes["arXiv:1"].meta.abstract = "Diffusion is slow to train. We introduce REPA, which aligns features."
+    g.nodes["arXiv:2"].meta.abstract = "We propose Geometry Forcing for consistent world models."
+    g.nodes["arXiv:2"].meta.intro = "Geometry Forcing makes world models consistent."
+    from paper_lineage.quality import normalize
+    h = render_html(normalize(g))           # engine runs and --render both normalize before rendering
+    assert '<div class="blurb quoted">“We introduce REPA, which aligns features.”' in h      # verbatim, no LLM
+    assert '<div class="blurb">Geometry Forcing makes world models consistent.</div>' in h   # LLM summary...
+    assert "“We propose Geometry Forcing for consistent world models.”" in h                 # ...and its source
+    data = _json.loads(h.split('<script type="application/json" id="data">')[1].split("</script>")[0])
+    assert data["nodes"]["arXiv:1"]["intro"] == "We introduce REPA, which aligns features."   # canvas hover

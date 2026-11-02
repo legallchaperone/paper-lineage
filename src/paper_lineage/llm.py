@@ -137,3 +137,103 @@ class ScriptedLLM:
             if needle in user:
                 return reply
         return self.default
+
+
+class CodexCLILLM:
+    """Uses a ChatGPT subscription (Plus/Pro/Team/...) through OpenAI's official Codex CLI, no API key.
+
+    Each request runs `codex exec` non-interactively in an empty temporary folder with a read-only
+    sandbox, and the final message is read back as JSON. Sign in once with `codex login` ("Sign in with
+    ChatGPT"). Slower than an API endpoint (each call starts an agent turn) and counts against the
+    subscription's usage limits.
+
+    Environment: LINEAGE_CODEX_BIN (default `codex`), LINEAGE_LLM_MODEL (optional; Codex's default model
+    otherwise), LINEAGE_CODEX_EFFORT (optional reasoning effort, e.g. `low` for faster runs)."""
+
+    INSTRUCTIONS = ("Answer directly from the text below. Do not run commands, read or write files, or browse. "
+                    "Your final message must be the JSON object only, with no prose or code fences.")
+
+    def __init__(self, model: str | None = None, cache: DiskCache | None = None, binary: str | None = None,
+                 effort: str | None = None, timeout: float = 600.0, runner=None):
+        self.binary = binary or os.environ.get("LINEAGE_CODEX_BIN") or "codex"
+        self.model = model if model is not None else (os.environ.get("LINEAGE_LLM_MODEL") or "")
+        self.effort = effort if effort is not None else (os.environ.get("LINEAGE_CODEX_EFFORT") or "")
+        self.cache = cache
+        self.timeout = timeout
+        self.calls = 0
+        self.usage = {"prompt_tokens": 0, "completion_tokens": 0}   # not reported by `codex exec`
+        import subprocess
+        self._run = runner or subprocess.run
+
+    @classmethod
+    def from_env(cls, cache: DiskCache | None = None) -> CodexCLILLM:
+        return cls(cache=cache)
+
+    def command(self, workdir: str, out_file: str) -> list[str]:
+        cmd = [self.binary, "exec", "--skip-git-repo-check", "--sandbox", "read-only", "--color", "never",
+               "-C", workdir, "-o", out_file]
+        if self.model:
+            cmd += ["-m", self.model]
+        if self.effort:
+            cmd += ["-c", f'model_reasoning_effort="{self.effort}"']
+        return cmd + ["-"]                        # prompt on stdin (no argv length limit)
+
+    def complete_json(self, system: str, user: str) -> dict:
+        import shutil
+        import subprocess
+        import tempfile
+
+        prompt = f"{system}\n\n{self.INSTRUCTIONS}\n\n{user}"
+        ck = hashlib.sha256(json.dumps(["codex", self.model, self.effort, prompt]).encode()).hexdigest()
+        if self.cache:
+            hit = self.cache.get("llm", ck)
+            if hit is not None:
+                return hit
+        if self._run is subprocess.run and not shutil.which(self.binary):
+            raise RuntimeError(f"Codex CLI not found ({self.binary!r}). Install it with `npm i -g @openai/codex` "
+                               "and sign in with `codex login`.")
+        last: Exception | None = None
+        for attempt in range(3):
+            with tempfile.TemporaryDirectory(prefix="lineage-codex-") as d:
+                out = os.path.join(d, "last_message.txt")
+                work = os.path.join(d, "work")
+                os.mkdir(work)
+                try:
+                    r = self._run(self.command(work, out), input=prompt, capture_output=True, text=True,
+                                  timeout=self.timeout)
+                except subprocess.TimeoutExpired as e:
+                    last = e
+                    continue
+                text = ""
+                if os.path.exists(out):
+                    with open(out, encoding="utf-8") as fh:
+                        text = fh.read()
+            if r.returncode != 0:
+                msg = (r.stderr or r.stdout or "").strip()[-500:]
+                if re.search(r"log ?in|logged out|unauthori[sz]ed|401", msg, re.I):
+                    raise RuntimeError(f"Codex CLI is not signed in; run `codex login`. ({msg})")
+                last = RuntimeError(f"codex exec exited {r.returncode}: {msg}")
+                time.sleep(2 ** attempt)
+                continue
+            self.calls += 1
+            try:
+                result = extract_json(text or r.stdout or "")
+            except (ValueError, json.JSONDecodeError) as e:
+                last = e
+                continue
+            if self.cache:
+                self.cache.set("llm", ck, result)
+            return result
+        raise RuntimeError(f"Codex CLI call failed: {last}")
+
+
+def make_llm(provider: str | None = None, cache: DiskCache | None = None) -> LLM | None:
+    """The configured LLM: `api` (OpenAI-compatible endpoint, the default) or `codex` (ChatGPT subscription
+    via the Codex CLI). None when the API provider is not configured."""
+    provider = (provider or os.environ.get("LINEAGE_LLM_PROVIDER") or "api").lower()
+    if provider in ("codex", "chatgpt"):
+        return CodexCLILLM.from_env(cache=cache)
+    if provider != "api":
+        raise ValueError(f"unknown LLM provider {provider!r}; use 'api' or 'codex'")
+    cfg = LLMConfig.from_env()
+    return OpenAICompatLLM(cfg, cache=cache) if cfg else None

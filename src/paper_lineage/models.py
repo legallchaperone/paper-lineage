@@ -49,6 +49,8 @@ class PaperMeta:
     abstract: str | None = None
     embedding: list[float] | None = None
     alias: str | None = None      # how citing papers refer to it, e.g. "REPA", "DFoT"
+    intro_quote: str | None = None  # the abstract sentence saying what the paper does (verbatim), see intros.py
+    intro: str | None = None        # optional one-sentence LLM summary of the abstract, checked against it
 
     @property
     def url(self) -> str | None:

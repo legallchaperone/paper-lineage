@@ -14,7 +14,7 @@ from rich.console import Console
 from .arxiv import normalize_arxiv_id
 from .classify import HeuristicClassifier, LLMClassifier
 from .engine import Config, Engine
-from .llm import LLMConfig, OpenAICompatLLM
+from .llm import LLMConfig, OpenAICompatLLM, make_llm
 from .render import render_html, render_json, render_mermaid
 from .render.tree import build_renderable
 from .source import PaperSource
@@ -42,6 +42,9 @@ def main(
     output: Optional[Path] = typer.Option(None, "--output", "-o",
                                           help="Output path stem for file formats (default lineage-<id>)."),
     no_llm: bool = typer.Option(False, "--no-llm", help="Heuristics only (no LLM calls)."),
+    llm_provider: str = typer.Option(os.environ.get("LINEAGE_LLM_PROVIDER", "api"), "--llm",
+                                     help="api: OpenAI-compatible endpoint (LINEAGE_LLM_* env); "
+                                          "codex: your ChatGPT subscription via the Codex CLI (`codex login`)."),
     evidence: bool = typer.Option(False, "--evidence", help="Print evidence quotes in the tree view."),
     cache_dir: Path = typer.Option(Path(os.environ.get("LINEAGE_CACHE_DIR", "~/.cache/paper-lineage")),
                                    "--cache-dir"),
@@ -56,6 +59,18 @@ def main(
                         format="%(levelname)s %(name)s: %(message)s")
     for name in ("httpx", "httpcore"):
         logging.getLogger(name).setLevel(logging.WARNING)
+    if llm_provider.lower() not in ("api", "codex", "chatgpt"):
+        raise typer.BadParameter("--llm must be api or codex")
+    if check_llm and llm_provider.lower() != "api":
+        llm = make_llm(llm_provider)
+        try:
+            reply = llm.complete_json("Reply with a JSON object only.", 'Return {"ok": true}')
+        except Exception as e:
+            err.print(f"[red]LLM check failed:[/red] {e}")
+            raise typer.Exit(1) from None
+        err.print(f"[green]LLM OK[/green] via Codex CLI (ChatGPT subscription), model "
+                  f"{llm.model or 'Codex default'}: {reply}")
+        raise typer.Exit(0)
     if check_llm:
         cfg = LLMConfig.from_env()
         if cfg is None:
@@ -94,13 +109,14 @@ def main(
     if no_llm:
         classifier = HeuristicClassifier()
     else:
-        cfg = LLMConfig.from_env()
-        if cfg is None:
+        llm = make_llm(llm_provider, cache=source.cache)
+        if llm is None:
             err.print("[yellow]No LLM configured (set LINEAGE_LLM_BASE_URL and LINEAGE_LLM_MODEL, "
-                      "optionally LINEAGE_LLM_API_KEY). Falling back to --no-llm heuristics.[/yellow]")
+                      "optionally LINEAGE_LLM_API_KEY, or use --llm codex with a ChatGPT subscription). "
+                      "Falling back to --no-llm heuristics.[/yellow]")
             classifier = HeuristicClassifier()
         else:
-            classifier = LLMClassifier(OpenAICompatLLM(cfg, cache=source.cache))
+            classifier = LLMClassifier(llm)
     config = Config(max_depth=max_depth, max_nodes=max_nodes, parents_per_node=parents_per_node,
                     alternatives=alternatives, min_relevance=min_relevance, spine=spine,
                     descendants=descendants, concurrent=concurrent)
